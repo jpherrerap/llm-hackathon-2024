@@ -40,15 +40,15 @@ def get_messages():
 app = FastAPI(debug=True)
 
 # Set static file location
-app.mount("/assets", StaticFiles(directory="app/dist/assets", html=True), name="static")
+# app.mount("/assets", StaticFiles(directory="dist/assets", ht), name="static")
 
-# Setup Jinja2 templates to serve index.html
-templates = Jinja2Templates(directory="app/dist")
+# # Setup Jinja2 templates to serve index.html
+# templates = Jinja2Templates(directory="app/src")
 
 # Serve index.html template from the root path
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return "hola"
 
 # Create a websocket connection
 @app.websocket("/ws")
@@ -77,8 +77,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 messages = get_messages()
                 await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
 
+            if message_data['type'] == 'ping':
+                await websocket.send_text(json.dumps({'type': 'pong'}))
+
     except WebSocketDisconnect:
         print("Client disconnected")
+        print(get_messages())
 
 if __name__ == "__main__":
     import uvicorn
