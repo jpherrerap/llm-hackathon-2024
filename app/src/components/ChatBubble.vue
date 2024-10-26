@@ -25,12 +25,12 @@ export default {
 .chat-bubble {
     display: flex;
     align-items: center;
-    flex-direction: row;
+    flex-direction: row-reverse;
     margin-bottom: 10px;
 }
 
 .chat-bubble.assistant {
-    flex-direction: row-reverse;
+    flex-direction: row;
 }
 
 .chat-bubble-avatar {

@@ -3,12 +3,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import os
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
 
 # read local .env file
 _ = load_dotenv(find_dotenv())
+chat_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
 
 # Connect to MongoDB
 uri = os.environ["MONGO_URI"]
@@ -19,17 +21,14 @@ messages_collection.delete_many({}) # Clear the messages collection
 messages_collection.insert_one({'role': 'system', 'content': 'You are a helpful assistant'}) # Add a system message
 
 # Get the API key from environment variables
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # Create a OpenAI ChatGPT completion function
 def get_chat_response():
     messages = get_messages()
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=0.7
-    )
-    messages_collection.insert_one({'role': 'assistant', 'content': response.choices[0].message['content']})
+    response = chat_client.chat.completions.create(model="gpt-3.5-turbo",
+    messages=messages,
+    temperature=0.7)
+    messages_collection.insert_one({'role': 'assistant', 'content': response.choices[0].message.content})
 
 def get_messages():
     messages = list(messages_collection.find({}))

@@ -5,3 +5,11 @@ python-dotenv
 jinja2
 websockets
 pymongo
+requests
+beautifulsoup4
+langchain
+langchain-community
+langchain-cli
+langchain-core
+langchain-openai
+langchain-groq

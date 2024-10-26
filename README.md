@@ -1,29 +1,89 @@
-# vue-chatbot
+# Aplicación de Soporte al Cliente con IA
 
-A simple LLM-powered chatbot webapp in Vue.js with FastAPI backend
+Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza un backend en Python con FastAPI y un frontend en Vue.js para proporcionar una interfaz de chat interactiva que puede responder a las consultas de los clientes.
 
-## Running the app
+## Características
 
-The easiest way to run this app and part of the intention of its creation is to run it via the `docker-compose` functionality. This will start the backend which hosts the page, the database and run them in containers. The only thing you need to do is to create a `.env` file in the root directory of the project and add your OpenAI API key there. The file should look like this:
+- Chat en tiempo real con IA
+- Interfaz de usuario intuitiva
+- Backend robusto con FastAPI
+- Almacenamiento de mensajes en MongoDB
 
-```bash
-OPENAI_API_KEY=your_api_key
-```
+## Requisitos
 
-Then you can run the app with `docker-compose up --build`. This will build the containers and start them. The app will be available at `localhost:8000`.
+- Docker y Docker Compose (recomendado), Node.js 14+
+- Alternativamente: Python 3.11+, Node.js 14+, MongoDB
 
-## Steps to reproduce
+## Configuración y Ejecución
 
-1. Create a new Vue.js project with `npm create vue@latest`. This will require Node.js and npm to be installed.
-2. Follow the steps to get your first page up and running, `cd app`, `npm install`, `npm run dev`.
-3. Observe the structure of the project and the files created. Two screenshots here, one of page and one of file structure.
-4. Get rid of the current contents as we are going to put in our own. Chat content, and input bar
-5. Style the components and make them look like they should by adding things in them.
-6. Create the backend with FastAPI. `pip install fastapi` and `pip install uvicorn`. Python <= 3.11 is required. Create a new file called `main.py`. We are also going to use OpenAI API so `pip install openai` and `pip install python-dotenv`.
-7. Build the page with `npm run build` and then update the backend to host the static page.
-8. Let's make them talk with a websocket. `npm install reconnecting-websocket`, `pip install websockets`.
-9. Incorporate OpenAI API key and make the backend talk to OpenAI API. Use `.env` file to store the API key.
-10. Create a mongodb backend to store all the data
-11. Dockerize
+### Backend usando Docker Compose (Recomendado)
 
-## Installation
+1. Clona este repositorio:
+   ```
+   git clone <url-del-repositorio>
+   cd <nombre-del-directorio>
+   ```
+
+2. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de OpenAI:
+   ```
+   OPENAI_API_KEY=tu_clave_api_aqui
+   ```
+
+3. Ejecuta el backend con Docker Compose:
+   ```
+   docker compose up --build
+   ```
+
+4. Accede a la aplicación en `http://localhost:8000`
+
+### Opción 2: Backend Manual
+
+1. Instala las dependencias de Python:
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. Instala y ejecuta MongoDB
+
+3. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de OpenAI:
+   ```
+   OPENAI_API_KEY=tu_clave_api_aqui
+   MONGO_URI=mongodb://localhost:27017
+   ```
+
+4. Ejecuta el servidor FastAPI:
+   ```
+   python main.py
+   ```
+
+### Frontend
+
+1. Navega al directorio de la aplicación:
+   ```
+   cd app
+   ```
+
+2. Instala las dependencias de Node.js:
+   ```
+   npm install
+   ```
+
+3. Ejecuta el servidor de desarrollo:
+   ```
+   npm run dev
+   ```
+
+4. Accede a la aplicación en la URL proporcionada por Vite (generalmente `http://localhost:5173`)
+
+## Uso
+
+Una vez que la aplicación esté en funcionamiento, puedes interactuar con el chatbot de IA a través de la interfaz web. Escribe tus preguntas o comentarios en el campo de entrada y recibirás respuestas generadas por la IA.
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, abre un issue para discutir cambios mayores antes de crear un pull request.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
