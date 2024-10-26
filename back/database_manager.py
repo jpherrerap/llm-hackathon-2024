@@ -80,7 +80,8 @@ class FAQManager:
 
     def _initialize_knowledge_db(self):
         faqs = self.json_adapter.load_faqs()
-        
+        for faq in faqs:
+            print(faq)
         # Create a list of Document objects
         documents = [
             Document(
@@ -88,6 +89,9 @@ class FAQManager:
                 metadata={"question": faq["question"], "answer": faq["answer"]}
             ) for faq in faqs
         ]
+        
+        for doc in documents:
+            print(doc)
 
         # Split documents
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=100)
