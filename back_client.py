@@ -1,4 +1,4 @@
-from back.back_client import BackClient
+from back.client import BackClient
 
 def main():
     back_client = BackClient("knowledge_db.json", "tickets_db.json")

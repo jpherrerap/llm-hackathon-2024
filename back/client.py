@@ -1,9 +1,9 @@
 import os
-from typing import Dict
+from typing import Dict, List
 from dotenv import load_dotenv
 from openai import OpenAI
 from swarm import Swarm
-from back.agents import create_triage_agent, create_database_agent, create_customer_service_agent
+from back.agents import create_welcome_agent, create_triage_agent, create_database_agent, create_customer_service_agent
 from back.database_manager import KnowledgeDatabase, TicketDatabase
 
 load_dotenv()
@@ -11,6 +11,9 @@ load_dotenv()
 class BackClient:
     def __init__(self, knowledge_db_file: str, ticket_db_file: str):
         self.groq_api_key = os.getenv("GROQ_API_KEY")
+        if not self.groq_api_key:
+            raise ValueError("GROQ_API_KEY is not set in the environment variables.")
+        
         self.client = OpenAI(
             base_url="https://api.groq.com/openai/v1",
             api_key=self.groq_api_key,
@@ -20,18 +23,29 @@ class BackClient:
         self.ticket_db = TicketDatabase(ticket_db_file)
 
         # Inicializar agentes
+        self.welcome_agent = create_welcome_agent()
         self.triage_agent = create_triage_agent()
         self.database_agent = create_database_agent(self.knowledge_db)
         self.customer_service_agent = create_customer_service_agent()
 
-    def process_user_query(self, user_query: str, user_data: Dict[str, str]) -> str:
+    def start_conversation(self) -> str:
+        welcome_response = self.swarm.run(
+            agent=self.welcome_agent,
+            messages=[{"role": "system", "content": "Inicia la conversación con el usuario."}]
+        )
+        return welcome_response.messages[-1]["content"]
+
+    def process_user_query(self, user_query: str, user_data: Dict[str, str], conversation_history: List[Dict[str, str]]) -> str:
         # Guardar el ticket de consulta
         ticket_id = self.ticket_db.save_ticket(user_data, user_query)
+
+        # Agregar la consulta del usuario al historial de la conversación
+        conversation_history.append({"role": "user", "content": user_query})
 
         # Iniciar con el agente de triage
         triage_response = self.swarm.run(
             agent=self.triage_agent,
-            messages=[{"role": "user", "content": user_query}]
+            messages=conversation_history
         )
 
         if triage_response.agent.name == "DatabaseAgent":
@@ -47,11 +61,20 @@ class BackClient:
                     agent=self.customer_service_agent,
                     messages=[{"role": "user", "content": user_query}]
                 )
-                return cs_response.messages[-1]["content"]
+                response = cs_response.messages[-1]["content"]
             else:
-                return db_response.messages[-1]["content"]
+                response = db_response.messages[-1]["content"]
         else:
-            return "Lo siento, no puedo procesar esta consulta en este momento."
+            # Continuar la conversación con el agente de bienvenida
+            welcome_response = self.swarm.run(
+                agent=self.welcome_agent,
+                messages=conversation_history + [{"role": "system", "content": "Continúa la conversación con el usuario."}]
+            )
+            response = welcome_response.messages[-1]["content"]
+
+        # Agregar la respuesta al historial de la conversación
+        conversation_history.append({"role": "assistant", "content": response})
+        return response
 
     def get_user_data(self) -> Dict[str, str]:
         print("Por favor, proporcione sus datos:")
@@ -69,5 +92,5 @@ if __name__ == "__main__":
         if user_input.lower() == 'salir':
             break
         user_data = back_client.get_user_data()
-        response = back_client.process_user_query(user_input, user_data)
+        response = back_client.process_user_query(user_input, user_data, [])
         print("Asistente:", response)
