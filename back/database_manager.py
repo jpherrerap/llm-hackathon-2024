@@ -1,51 +1,139 @@
 import json
 import os
+import tempfile
+import shutil
 from typing import Dict, List, Any
+from uuid import uuid4
 from langchain.schema import Document
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from openai import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-class KnowledgeDatabase:
-    def __init__(self, embeddings):
-        self.embeddings = embeddings
-        self.vectorstore = None
+class FAQManager:
+    def __init__(self, json_file: str):
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"), # TODO: Cambiar por GROQ_API_KEY
+            # base_url="https://api.groq.com/openai/v1",
+        )
+        self.embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+            client=self.client,
+            embedding_ctx_length=8191,  # Longitud máxima del contexto
+            chunk_size=1000,  # Tamaño del chunk para procesamiento por lotes
+        )
+        self.json_adapter = JSONAdapter(json_file)
+        self.knowledge_db = None
+        self.persist_directory = tempfile.mkdtemp()  # Crear un directorio temporal
+        self._initialize_knowledge_db()
 
-    def initialize_from_documents(self, documents: List[Document]):
-        texts = [doc.page_content for doc in documents]
-        metadatas = [doc.metadata for doc in documents]
+    def _initialize_knowledge_db(self):
+        faqs = self.json_adapter.load_faqs()
         
-        # Debug: Print the texts and metadatas
-        print("Texts:", texts)
-        print("Metadatas:", metadatas)
+        if not faqs:
+            print("No hay FAQs disponibles para inicializar la base de datos vectorial.")
+            self.knowledge_db = Chroma(
+                embedding_function=self.embeddings,
+                collection_name="faq-collection",
+                persist_directory=self.persist_directory
+            )
+            return
+
+        # Crear documentos manteniendo tanto la pregunta como la respuesta en los metadatos
+        documents = []
+        for faq in faqs:
+            # Usamos la respuesta como contenido principal y guardamos ambos en metadata
+            doc = Document(
+                page_content=faq["answer"],
+                metadata={
+                    "question": faq["question"],
+                    "answer": faq["answer"]  # Guardamos la respuesta completa en metadata
+                },
+                id=str(uuid4())  # Agregar un ID único
+            )
+            documents.append(doc)
+
+        # Configurar el text splitter con parámetros más apropiados para FAQ
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,  # Reducido para mejor manejo de FAQs
+            chunk_overlap=200,  # Aumentado para mejor contexto
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""]
+        )
         
-        # Ensure all texts are strings
-        assert all(isinstance(text, str) for text in texts), "All texts must be strings"
+        # Dividir los documentos manteniendo los metadatos
+        all_splits = text_splitter.split_documents(documents)
         
-        self.vectorstore = Chroma.from_texts(
-            texts=texts,
+        # Asegurarse de que cada split mantenga los metadatos originales
+        for split in all_splits:
+            # Asegurarse de que los metadatos contengan tanto la pregunta como la respuesta
+            if 'question' not in split.metadata or 'answer' not in split.metadata:
+                original_doc = next(d for d in documents if d.metadata['question'] == split.metadata['question'])
+                split.metadata = original_doc.metadata
+            split.id = str(uuid4())  # Asignar un nuevo ID único a cada split
+
+        # Crear y persistir la base de datos vectorial
+        self.knowledge_db = Chroma.from_documents(
+            documents=all_splits,
             embedding=self.embeddings,
-            metadatas=metadatas,
-            persist_directory="./chroma_db"
+            collection_name="faq-collection",
+            persist_directory=self.persist_directory,
+            ids=[doc.id for doc in all_splits]  # Pasar los IDs explícitamente
         )
 
-    def search_faq(self, query: str) -> List[Dict[str, Any]]:
-        if not self.vectorstore:
-            raise ValueError("Vector store not initialized. Call initialize_from_documents first.")
-        results = self.vectorstore.similarity_search_with_score(query, k=3)
-        return [
-            {
-                "question": doc.metadata['question'],
-                "answer": doc.page_content,
-                "score": score
-            } for doc, score in results
-        ]
+        print(f"Base de datos vectorial inicializada con {len(all_splits)} documentos.")
 
-    def add_document(self, document: Document):
-        if not self.vectorstore:
-            raise ValueError("Vector store not initialized. Call initialize_from_documents first.")
-        self.vectorstore.add_texts([document.page_content], [document.metadata])
+    def search_faq(self, query: str, k: int = 3) -> List[Dict[str, Any]]:
+        if not self.knowledge_db:
+            raise ValueError("Vector store no inicializado.")
+        
+        results = self.knowledge_db.similarity_search_with_score(query, k=k)
+        
+        # Formatear los resultados manteniendo la información completa
+        formatted_results = []
+        for doc, score in results:
+            formatted_results.append({
+                "question": doc.metadata['question'],
+                "answer": doc.metadata['answer'],  # Usar la respuesta completa de metadata
+                "score": score
+            })
+            
+        return formatted_results
+
+    def add_faq(self, question: str, answer: str):
+        # Guardar en JSON
+        self.json_adapter.save_faq(question, answer)
+        
+        # Crear nuevo documento con metadata completa
+        new_doc = Document(
+            page_content=answer,
+            metadata={
+                "question": question,
+                "answer": answer
+            },
+            id=str(uuid4())  # Agregar un ID único
+        )
+        
+        # Dividir el documento
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""]
+        )
+        splits = text_splitter.split_documents([new_doc])
+        
+        # Asegurar que cada split mantenga los metadatos completos
+        for split in splits:
+            split.metadata = new_doc.metadata
+            split.id = str(uuid4())  # Asignar un nuevo ID único a cada split
+            
+        # Añadir a la base de datos vectorial
+        self.knowledge_db.add_documents(documents=splits, ids=[doc.id for doc in splits])
+
+    def __del__(self):
+        # Limpiar el directorio temporal cuando se destruye la instancia
+        shutil.rmtree(self.persist_directory, ignore_errors=True)
 
 class JSONAdapter:
     def __init__(self, file_path: str):
@@ -66,65 +154,6 @@ class JSONAdapter:
 
     def get_all_faqs(self) -> List[Dict[str, str]]:
         return self.load_faqs()
-
-class FAQManager:
-    def __init__(self, json_file: str):
-        self.client = OpenAI(
-            api_key=os.getenv("GROQ_API_KEY"),
-            base_url="https://api.groq.com/openai/v1",
-        )
-        self.embeddings = OpenAIEmbeddings(client=self.client)
-        self.json_adapter = JSONAdapter(json_file)
-        self.knowledge_db = None
-        self._initialize_knowledge_db()
-
-    def _initialize_knowledge_db(self):
-        faqs = self.json_adapter.load_faqs()
-        for faq in faqs:
-            print(faq)
-        # Create a list of Document objects
-        documents = [
-            Document(
-                page_content=f"{faq['question']} {faq['answer']}",
-                metadata={"question": faq["question"], "answer": faq["answer"]}
-            ) for faq in faqs
-        ]
-        
-        for doc in documents:
-            print(doc)
-
-        # Split documents
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=100)
-        all_splits = text_splitter.split_documents(documents)
-
-        # Create and store the vector database
-        self.knowledge_db = Chroma.from_documents(
-            documents=all_splits,
-            embedding=self.embeddings,
-            collection_name="faq-collection",
-            persist_directory="./chroma_db"
-        )
-
-        print(f"Vector database initialized with {len(all_splits)} documents.")
-
-    def search_faq(self, query: str) -> List[Dict[str, Any]]:
-        if not self.knowledge_db:
-            raise ValueError("Vector store not initialized.")
-        results = self.knowledge_db.similarity_search_with_score(query, k=3)
-        return [
-            {
-                "question": doc.metadata['question'],
-                "answer": doc.metadata['answer'],
-                "score": score
-            } for doc, score in results
-        ]
-
-    def add_faq(self, question: str, answer: str):
-        self.json_adapter.save_faq(question, answer)
-        new_doc = Document(page_content=question, metadata={"answer": answer})
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=100)
-        splits = text_splitter.split_documents([new_doc])
-        self.knowledge_db.add_documents(splits)
 
     def get_all_faqs(self) -> List[Dict[str, str]]:
         return self.json_adapter.get_all_faqs()

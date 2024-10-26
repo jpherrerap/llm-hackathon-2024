@@ -3,14 +3,9 @@ from typing import Dict, List, Tuple
 from dotenv import load_dotenv
 from openai import OpenAI
 from swarm import Swarm
-from back.agents import (
-    create_welcome_agent, 
-    create_triage_agent, 
-    create_database_search_agent,
-    create_answer_selection_agent, 
-    create_customer_service_agent
-)
+from back.agents import create_triage_agent
 from back.database_manager import FAQManager, TicketDatabase
+import json
 
 load_dotenv()
 
@@ -28,19 +23,19 @@ class BackClient:
         self.faq_manager = FAQManager(knowledge_db_file)
         self.ticket_db = TicketDatabase(ticket_db_file)
 
-        # Inicializar agentes
-        self.welcome_agent = create_welcome_agent()
-        self.triage_agent = create_triage_agent()
-        self.database_search_agent = create_database_search_agent(self.faq_manager)
-        self.answer_selection_agent = create_answer_selection_agent()
-        self.customer_service_agent = create_customer_service_agent()
+        # Inicializar agente de triage
+        self.triage_agent = create_triage_agent(self.faq_manager)
 
     def start_conversation(self) -> str:
         welcome_response = self.swarm.run(
-            agent=self.welcome_agent,
-            messages=[{"role": "system", "content": "Inicia la conversación con el usuario."}]
+            agent=self.triage_agent,
+            messages=[{"role": "system", "content": "Inicia la conversación con un saludo de bienvenida."}]
         )
-        return welcome_response.messages[-1]["content"]
+        try:
+            result = json.loads(welcome_response.messages[-1]["content"])
+            return result["response"]
+        except json.JSONDecodeError:
+            return welcome_response.messages[-1]["content"]
 
     def process_user_query(self, user_query: str, user_data: Dict[str, str], conversation_history: List[Dict[str, str]], ticket_id: str = None) -> Tuple[str, str]:
         if not ticket_id:
@@ -52,31 +47,17 @@ class BackClient:
 
         triage_response = self.swarm.run(
             agent=self.triage_agent,
-            messages=conversation_history
+            messages=[
+                {"role": "system", "content": "Procesa la consulta del usuario y proporciona una respuesta adecuada."},
+                *conversation_history
+            ]
         )
 
-        if "DatabaseAgent" in triage_response.messages[-1]["content"]:
-            db_search_response = self.swarm.run(
-                agent=self.database_search_agent,
-                messages=[{"role": "user", "content": user_query}]
-            )
-            
-            search_result = eval(db_search_response.messages[-1]["content"])
-            
-            if search_result["answer"] and search_result["confidence"] > 0.7:  # Umbral de confianza
-                response = f"Basado en la pregunta '{search_result['question']}', la respuesta es: {search_result['answer']}"
-            else:
-                cs_response = self.swarm.run(
-                    agent=self.customer_service_agent,
-                    messages=[{"role": "user", "content": user_query}]
-                )
-                response = cs_response.messages[-1]["content"]
-        else:
-            welcome_response = self.swarm.run(
-                agent=self.welcome_agent,
-                messages=conversation_history + [{"role": "system", "content": "Continúa la conversación con el usuario."}]
-            )
-            response = welcome_response.messages[-1]["content"]
+        try:
+            result = json.loads(triage_response.messages[-1]["content"])
+            response = result["response"]
+        except json.JSONDecodeError:
+            response = triage_response.messages[-1]["content"]
 
         conversation_history.append({"role": "assistant", "content": response})
         return response, ticket_id
@@ -92,10 +73,17 @@ class BackClient:
 if __name__ == "__main__":
     back_client = BackClient("knowledge_db.json", "ticket_db.json")
     
+    conversation_history = []
+    user_data = back_client.get_user_data()
+    ticket_id = None
+
+    welcome_message = back_client.start_conversation()
+    print("Asistente:", welcome_message)
+    conversation_history.append({"role": "assistant", "content": welcome_message})
+
     while True:
         user_input = input("Usuario: ")
         if user_input.lower() == 'salir':
             break
-        user_data = back_client.get_user_data()
-        response = back_client.process_user_query(user_input, user_data, [])
+        response, ticket_id = back_client.process_user_query(user_input, user_data, conversation_history, ticket_id)
         print("Asistente:", response)
