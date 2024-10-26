@@ -3,6 +3,7 @@ import sys
 import json
 from dotenv import load_dotenv
 from back.client import BackClient
+import shutil
 
 # Añadir el directorio actual al sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -27,17 +28,19 @@ def create_test_databases():
             }
         ]
     }
-    with open("test_db_knowledge.json", "w") as f:
-        json.dump(knowledge_db, f, indent=2)
+    with open("test_db_knowledge.json", "w", encoding="utf-8") as f:
+        json.dump(knowledge_db, f, indent=2, ensure_ascii=False)
 
     # Crear base de datos de tickets de prueba
     ticket_db = {"tickets": []}
-    with open("test_db_tickets.json", "w") as f:
-        json.dump(ticket_db, f, indent=2)
+    with open("test_db_tickets.json", "w", encoding="utf-8") as f:
+        json.dump(ticket_db, f, indent=2, ensure_ascii=False)
 
 def remove_test_databases():
     os.remove("test_db_knowledge.json")
     os.remove("test_db_tickets.json")
+    # Eliminar la base de datos de ChromaDB
+    shutil.rmtree("./chroma_db", ignore_errors=True)
 
 def test_backend():
     # Crear bases de datos de prueba
