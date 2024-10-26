@@ -1,0 +1,40 @@
+{
+  "faqs": [
+    {
+      "question": "¿Hasta cuándo tienen plazo los productos comprados en Cyber Monday para cambios?",
+      "answer": "tienen hasta el 31 de enero del 2025."
+    },
+    {
+      "question": "¿Cuál es el plazo para cambios de productos comprados en el periodo navidad?",
+      "answer": "tienen hasta el 31 de enero del 2025."
+    },
+    {
+      "question": "¿Cuántos días tienes para pedir un cambio o reemplazo de la mayoría de los productos?",
+      "answer": "30 días desde que los recibes."
+    },
+    {
+      "question": "¿Qué tipo de productos se consideran pequeños o medianos?",
+      "answer": "Por ejemplo: perfumes, zapatos, microondas, televisores de hasta 32"
+    },
+    {
+      "question": "¿Qué debes hacer para cambiar un producto vendido por Sodimac o Falabella?",
+      "answer": "Dirígete a la tienda del vendedor correspondiente con el producto y su boleta."
+    },
+    {
+      "question": "¿Cómo puedes devolver un producto vendido por Tottus?",
+      "answer": "Crea una solicitud en Mis compras y entrega el producto en uno de nuestros Puntos de entrega o en una sucursal Chilexpress adherida."
+    },
+    {
+      "question": "¿Qué tipo de productos se consideran grandes o muy grandes?",
+      "answer": "Por ejemplo: refrigeradores, cocinas, camas, televisores de más de 32"
+    },
+    {
+      "question": "¿Qué debes hacer para solicitar un reemplazo de un producto grande?",
+      "answer": "Crea una solicitud de reemplazo en Mis compras."
+    },
+    {
+      "question": "¿Qué debes hacer si tu producto fue vendido por otro vendedor?",
+      "answer": "Solo lo puedes devolver."
+    }
+  ]
+}
