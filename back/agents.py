@@ -1,5 +1,5 @@
 from swarm import Agent
-from database_manager import DatabaseManager
+from back.database_manager import KnowledgeDatabase
 
 def create_triage_agent():
     def transfer_to_database_agent():
@@ -12,13 +12,13 @@ def create_triage_agent():
         model="llama3-groq-70b-8192-tool-use-preview"
     )
 
-def create_database_agent(db_manager: DatabaseManager):
+def create_database_agent(knowledge_db: KnowledgeDatabase):
     def search_database(query: str) -> str:
-        return db_manager.search_faq(query)
+        return knowledge_db.search_faq(query)
 
     return Agent(
         name="DatabaseAgent",
-        instructions="Busca información en la base de datos JSON.",
+        instructions="Busca información en la base de datos de conocimientos.",
         functions=[search_database],
         model="llama3-groq-70b-8192-tool-use-preview"
     )

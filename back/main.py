@@ -1,7 +1,7 @@
 from back.back_client import BackClient
 
 def main():
-    back_client = BackClient("database.json")
+    back_client = BackClient("knowledge_db.json", "tickets_db.json")
     
     while True:
         user_data = back_client.get_user_data()

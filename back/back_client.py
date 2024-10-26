@@ -4,28 +4,29 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from swarm import Swarm
 from back.agents import create_triage_agent, create_database_agent, create_customer_service_agent
-from back.database_manager import DatabaseManager
+from back.database_manager import KnowledgeDatabase, TicketDatabase
 
 load_dotenv()
 
 class BackClient:
-    def __init__(self, database_file: str):
+    def __init__(self, knowledge_db_file: str, ticket_db_file: str):
         self.groq_api_key = os.getenv("GROQ_API_KEY")
         self.client = OpenAI(
             base_url="https://api.groq.com/openai/v1",
             api_key=self.groq_api_key,
         )
         self.swarm = Swarm(client=self.client)
-        self.db_manager = DatabaseManager(database_file)
+        self.knowledge_db = KnowledgeDatabase(knowledge_db_file)
+        self.ticket_db = TicketDatabase(ticket_db_file)
 
         # Inicializar agentes
         self.triage_agent = create_triage_agent()
-        self.database_agent = create_database_agent(self.db_manager)
+        self.database_agent = create_database_agent(self.knowledge_db)
         self.customer_service_agent = create_customer_service_agent()
 
     def process_user_query(self, user_query: str, user_data: Dict[str, str]) -> str:
         # Guardar el ticket de consulta
-        ticket_id = self.db_manager.save_ticket(user_data, user_query)
+        ticket_id = self.ticket_db.save_ticket(user_data, user_query)
 
         # Iniciar con el agente de triage
         triage_response = self.swarm.run(
@@ -61,7 +62,7 @@ class BackClient:
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    back_client = BackClient("database.json")
+    back_client = BackClient("knowledge_db.json", "ticket_db.json")
     
     while True:
         user_input = input("Usuario: ")
