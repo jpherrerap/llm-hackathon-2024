@@ -1,9 +1,14 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from dotenv import load_dotenv
 from openai import OpenAI
 from swarm import Swarm
-from back.agents import create_welcome_agent, create_triage_agent, create_database_agent, create_customer_service_agent
+from back.agents import (
+    create_welcome_agent, 
+    create_triage_agent, 
+    create_database_agent, 
+    create_customer_service_agent
+)
 from back.database_manager import KnowledgeDatabase, TicketDatabase
 
 load_dotenv()
@@ -35,9 +40,13 @@ class BackClient:
         )
         return welcome_response.messages[-1]["content"]
 
-    def process_user_query(self, user_query: str, user_data: Dict[str, str], conversation_history: List[Dict[str, str]]) -> str:
-        # Guardar el ticket de consulta
-        ticket_id = self.ticket_db.save_ticket(user_data, user_query)
+    def process_user_query(self, user_query: str, user_data: Dict[str, str], conversation_history: List[Dict[str, str]], ticket_id: str = None) -> Tuple[str, str]:
+        # Si no hay ticket_id, crear uno nuevo
+        if not ticket_id:
+            ticket_id = self.ticket_db.save_ticket(user_data, user_query)
+        else:
+            # Actualizar el ticket existente con la nueva query
+            self.ticket_db.update_ticket(ticket_id, user_query)
 
         # Agregar la consulta del usuario al historial de la conversación
         conversation_history.append({"role": "user", "content": user_query})
@@ -48,22 +57,21 @@ class BackClient:
             messages=conversation_history
         )
 
-        if triage_response.agent.name == "DatabaseAgent":
+        if "DatabaseAgent" in triage_response.messages[-1]["content"]:
             # Consultar la base de datos
             db_response = self.swarm.run(
                 agent=self.database_agent,
                 messages=[{"role": "user", "content": user_query}]
             )
             
-            if "No se encontró información" in db_response.messages[-1]["content"]:
+            response = db_response.messages[-1]["content"]
+            if "No se encontró información" in response:
                 # Si no se encuentra información, derivar al agente de servicio al cliente
                 cs_response = self.swarm.run(
                     agent=self.customer_service_agent,
                     messages=[{"role": "user", "content": user_query}]
                 )
                 response = cs_response.messages[-1]["content"]
-            else:
-                response = db_response.messages[-1]["content"]
         else:
             # Continuar la conversación con el agente de bienvenida
             welcome_response = self.swarm.run(
@@ -74,7 +82,7 @@ class BackClient:
 
         # Agregar la respuesta al historial de la conversación
         conversation_history.append({"role": "assistant", "content": response})
-        return response
+        return response, ticket_id
 
     def get_user_data(self) -> Dict[str, str]:
         print("Por favor, proporcione sus datos:")

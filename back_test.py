@@ -20,6 +20,10 @@ def create_test_databases():
             {
                 "question": "¿Cuáles son los métodos de pago aceptados?",
                 "answer": "Aceptamos tarjetas de crédito, débito, PayPal y transferencia bancaria."
+            },
+            {
+                "question": "¿Cuánto tiempo tarda la entrega?",
+                "answer": "El tiempo de entrega estándar es de 3 a 5 días hábiles."
             }
         ]
     }
@@ -51,23 +55,27 @@ def test_backend():
     user_data = {"name": "Juan Pérez", "email": "juan@example.com", "phone": "123456789"}
     conversation_history = [{"role": "assistant", "content": welcome_message}]
 
-    queries = [
-        "Hola, necesito ayuda con una devolución",
-        "¿Cuál es la política de devoluciones?",
-        "¿Cuándo llegará mi pedido?",
-        "¿Cuál es el significado de la vida?",
-        "Gracias por tu ayuda"
-    ]
+    # Usar las preguntas de la base de FAQs
+    with open("test_db_knowledge.json", "r") as f:
+        knowledge_db = json.load(f)
+    
+    queries = [faq["question"] for faq in knowledge_db["faqs"]]
+    queries.append("¿Tienen alguna promoción actual?")  # Pregunta no en la base de datos
+    queries.append("Gracias por tu ayuda")
 
+    ticket_id = None
     for query in queries:
         print(f"\nUsuario: {query}")
-        response = back_client.process_user_query(query, user_data, conversation_history)
+        response, ticket_id = back_client.process_user_query(query, user_data, conversation_history, ticket_id)
         print(f"Asistente: {response}")
 
     # Verificar tickets guardados
     print("\nTickets guardados:")
     for ticket in back_client.ticket_db.get_all_tickets():
-        print(f"ID: {ticket['id']}, Query: {ticket['query']}")
+        print(f"ID: {ticket['id']}")
+        print(f"Queries: {ticket['queries']}")
+        print(f"User Data: {ticket['user_data']}")
+        print("---")
 
     # Eliminar bases de datos de prueba
     remove_test_databases()
