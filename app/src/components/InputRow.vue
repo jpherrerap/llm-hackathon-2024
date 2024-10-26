@@ -40,11 +40,11 @@ export default {
 </script>
 
 <template>
-    <div class='input-row'>
-        <button @click="clearMessages" class="btn-clear">Clear Chat</button>
-        <textarea rows="3" v-model="this.messageContent" placeholder="Type a message" @keydown.enter="sendMessage"></textarea>
-        <button @click="sendMessage" class="btn-send">Send</button>
-    </div>
+  <div class='input-row flex items-stretch bg-white rounded-lg shadow-md p-2'>
+    <button @click="clearMessages" class="btn-clear bg-red-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-red-600 transition-colors">Clear Chat</button>
+    <textarea rows="3" v-model="this.messageContent" placeholder="Type a message" @keydown.enter="sendMessage" class="flex-grow border rounded-lg p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+    <button @click="sendMessage" class="btn-send bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Send</button>
+  </div>
 </template>
 
 <style scoped>

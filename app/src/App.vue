@@ -45,12 +45,12 @@ export default {
 </script>
 
 <template>
-    <div class="app">
-        <div class="app-content">
-            <ChatContent :messages="this.messages"/>
-            <InputRow :sendSocketMessage="this.sendSocketMessage" :messages="this.messages"/>
-        </div>
+  <div class="app bg-background min-h-screen">
+    <div class="app-content max-w-4xl mx-auto p-4">
+      <ChatContent :messages="this.messages" class="mb-4"/>
+      <InputRow :sendSocketMessage="this.sendSocketMessage" :messages="this.messages"/>
     </div>
+  </div>
 </template>
 
 <style scoped>

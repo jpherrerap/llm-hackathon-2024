@@ -16,13 +16,13 @@ export default {
 </script>
 
 <template>
-    <div class="chat-content">
-        <ChatBubble
-            v-for="(message, index) in messages"
-            :key="index"
-            :message="message"
-        />
-    </div>
+  <div class="chat-content bg-white rounded-lg shadow-md p-4 h-[calc(100vh-200px)] overflow-auto">
+    <ChatBubble
+      v-for="(message, index) in messages"
+      :key="index"
+      :message="message"
+    />
+  </div>
 </template>
 
 <style scoped>

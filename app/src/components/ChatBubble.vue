@@ -11,21 +11,20 @@ export default {
 </script>
 
 <template>
-<div :class="['chat-bubble', message.role]">
-    <div class="chat-bubble-avatar">
-        {{ message.role[0].toUpperCase() }}
+  <div :class="['chat-bubble flex items-start mb-4', message.role === 'user' ? 'flex-row-reverse' : 'flex-row']">
+    <div :class="['chat-bubble-avatar w-10 h-10 rounded-full flex items-center justify-center text-white font-bold', message.role === 'user' ? 'bg-primary ml-2' : 'bg-secondary mr-2']">
+      {{ message.role[0].toUpperCase() }}
     </div>
-    <div class="chat-bubble-content">
-        {{ message.content }}
+    <div :class="['chat-bubble-content rounded-lg p-3 max-w-[80%]', message.role === 'user' ? 'bg-accent text-white' : 'bg-gray-100']">
+      {{ message.content }}
     </div>
-</div>
+  </div>
 </template>
 
 <style scoped>
 .chat-bubble {
     display: flex;
     align-items: center;
-    flex-direction: row-reverse;
     margin-bottom: 10px;
 }
 
@@ -63,4 +62,3 @@ export default {
     background-color: #f6f8d0;
 }
 </style>
-    
