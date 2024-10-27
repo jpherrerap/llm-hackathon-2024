@@ -81,8 +81,6 @@ class FAQManager:
             ids=[doc.id for doc in all_splits]  # Pasar los IDs explícitamente
         )
 
-        print(f"Base de datos vectorial inicializada con {len(all_splits)} documentos.")
-
     def search_faq(self, query: str, k: int = 3) -> List[Dict[str, Any]]:
         if not self.knowledge_db:
             raise ValueError("Vector store no inicializado.")
@@ -132,8 +130,9 @@ class FAQManager:
         self.knowledge_db.add_documents(documents=splits, ids=[doc.id for doc in splits])
 
     def __del__(self):
-        # Limpiar el directorio temporal cuando se destruye la instancia
-        shutil.rmtree(self.persist_directory, ignore_errors=True)
+        # Check if persist_directory exists before trying to delete it
+        if hasattr(self, 'persist_directory'):
+            shutil.rmtree(self.persist_directory, ignore_errors=True)
 
 class JSONAdapter:
     def __init__(self, file_path: str):
