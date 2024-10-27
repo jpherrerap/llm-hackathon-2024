@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from back.client import BackClient
+import asyncio
 
 # read local .env file
 _ = load_dotenv(find_dotenv())
@@ -56,45 +57,59 @@ async def root(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    client = await client_pool.get_client()
     try:
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            if message_data['type'] == 'get_messages':
-                messages = get_messages()
-                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
-
-            if message_data['type'] == 'new_message':
-                new_message = message_data['content']
-                messages_collection.insert_one({'role': 'user', 'content': new_message})
-                messages = get_messages()
-                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
-                get_chat_response()
-                messages = get_messages()
-                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
-
-            if message_data['type'] == 'clear_messages':
-                messages_collection.delete_many({})
-                messages_collection.insert_one({'role': 'system', 'content': 'You are a helpful assistant'})
-                messages = get_messages()
-                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
-
-            if message_data['type'] == 'ping':
-                await websocket.send_text(json.dumps({'type': 'pong'}))
-
+            
+            if message_data['type'] == 'start_conversation':
+                user_data = message_data['content']
+                client.set_user_data(user_data['name'], user_data['email'], user_data['phone'])
+                response = client.start_conversation()
+                await websocket.send_text(json.dumps({
+                    'type': 'conversation_started',
+                    'content': response.messages[-1]["content"]
+                }))
+            
+            elif message_data['type'] == 'user_query':
+                response = client.process_user_query(message_data['content'])
+                await websocket.send_text(json.dumps({
+                    'type': 'assistant_response',
+                    'content': response.messages[-1]["content"]
+                }))
+            
+            elif message_data['type'] == 'get_conversation_history':
+                history = client.get_conversation_history()
+                await websocket.send_text(json.dumps({
+                    'type': 'conversation_history',
+                    'content': history
+                }))
+    
     except WebSocketDisconnect:
-        print("Client disconnected")
-        print(get_messages())
+        print("WebSocket disconnected")
+    finally:
+        await client_pool.release_client(client)
 
 @app.get("/api/tickets")
 async def get_tickets():
-    # This is where you'd fetch tickets from your database
-    # For now, we'll return some dummy data
-    return [
-        {"id": 1, "title": "Cannot login", "description": "User is unable to login to their account", "createdAt": "2024-03-15T10:30:00Z", "resolved": False},
-        {"id": 2, "title": "Payment failed", "description": "Customer's payment was declined", "createdAt": "2024-03-14T15:45:00Z", "resolved": True},
-        {"id": 3, "title": "Product missing", "description": "Order arrived but one item is missing", "createdAt": "2024-03-13T09:00:00Z", "resolved": False},
-    ]
+    client = await client_pool.get_client()
+    try:
+        tickets = client.get_all_tickets()
+        # Transformar los tickets al formato esperado por el frontend
+        formatted_tickets = [
+            {
+                "id": ticket["id"],
+                "title": f"Consulta de {ticket['user_data']['name']}",
+                "description": ticket['conversation'][0]['content'] if ticket['conversation'] else "Sin descripción",
+                "createdAt": ticket.get('createdAt', "Fecha no disponible"),
+                "resolved": ticket.get('resolved', False)
+            }
+            for ticket in tickets
+        ]
+        return formatted_tickets
+    finally:
+        await client_pool.release_client(client)
 
 # Inicializar el BackClient
 back_client = BackClient("db_knowledge.json", "db_tickets.json")
@@ -109,28 +124,62 @@ class UserQuery(BaseModel):
 
 @app.post("/start_conversation")
 async def start_conversation(user_data: UserData):
-    back_client.set_user_data(user_data.name, user_data.email, user_data.phone)
-    response = back_client.start_conversation()
-    return {"message": response.messages[-1]["content"]}
+    client = await client_pool.get_client()
+    try:
+        client.set_user_data(user_data.name, user_data.email, user_data.phone)
+        response = client.start_conversation()
+        return {"message": response.messages[-1]["content"]}
+    finally:
+        await client_pool.release_client(client)
 
 @app.post("/process_query")
 async def process_query(user_query: UserQuery):
-    if not back_client.user_data:
-        raise HTTPException(status_code=400, detail="Conversation not started. Please start a conversation first.")
-    response = back_client.process_user_query(user_query.query)
-    return {"message": response.messages[-1]["content"]}
+    client = await client_pool.get_client()
+    try:
+        if not client.user_data:
+            raise HTTPException(status_code=400, detail="Conversation not started. Please start a conversation first.")
+        response = client.process_user_query(user_query.query)
+        return {"message": response.messages[-1]["content"]}
+    finally:
+        await client_pool.release_client(client)
 
 @app.get("/tickets")
 async def get_tickets():
-    tickets = back_client.get_all_tickets()
-    return tickets
+    client = await client_pool.get_client()
+    try:
+        tickets = client.get_all_tickets()
+        return tickets
+    finally:
+        await client_pool.release_client(client)
 
 @app.get("/tickets/{ticket_id}")
 async def get_ticket(ticket_id: str):
-    ticket = back_client.get_ticket(ticket_id)
-    if not ticket:
-        raise HTTPException(status_code=404, detail="Ticket not found")
-    return ticket
+    client = await client_pool.get_client()
+    try:
+        ticket = client.get_ticket(ticket_id)
+        if not ticket:
+            raise HTTPException(status_code=404, detail="Ticket not found")
+        return ticket
+    finally:
+        await client_pool.release_client(client)
+
+# Pool de conexiones para BackClient
+class BackClientPool:
+    def __init__(self, max_connections=10):
+        self.max_connections = max_connections
+        self.clients = asyncio.Queue(maxsize=max_connections)
+        self.semaphore = asyncio.Semaphore(max_connections)
+
+    async def get_client(self):
+        async with self.semaphore:
+            if self.clients.empty():
+                return BackClient("db_knowledge.json", "db_tickets.json")
+            return await self.clients.get()
+
+    async def release_client(self, client):
+        await self.clients.put(client)
+
+client_pool = BackClientPool()
 
 if __name__ == "__main__":
     import uvicorn

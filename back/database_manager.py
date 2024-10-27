@@ -9,6 +9,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from openai import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from datetime import datetime
 
 class FAQManager:
     def __init__(self, json_file: str):
@@ -177,7 +178,9 @@ class TicketDatabase:
                 "conversation": [
                     {"role": "system", "content": query},
                     {"role": "assistant", "content": response}
-                ]
+                ],
+                "createdAt": datetime.now().isoformat(),
+                "resolved": False
             })
             f.seek(0)
             f.truncate()
@@ -207,3 +210,14 @@ class TicketDatabase:
         with open(self.database_file, 'r') as f:
             database = json.load(f)
         return database['tickets']
+
+    def resolve_ticket(self, ticket_id: str):
+        with open(self.database_file, 'r+') as f:
+            database = json.load(f)
+            for ticket in database['tickets']:
+                if ticket['id'] == ticket_id:
+                    ticket['resolved'] = True
+                    break
+            f.seek(0)
+            f.truncate()
+            json.dump(database, f, indent=2)
