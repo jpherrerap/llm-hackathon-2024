@@ -91,7 +91,10 @@ class FAQScraper:
                 self._scrape_recursive(full_url, current_depth + 1, max_depth)
 
     def to_json(self, filename: str) -> None:
-        db_knowledge = json.loads(Path(filename).read_text())
+        db_knowledge = {"faq": []}
+        if Path(filename).exists():
+            db_knowledge = json.loads(Path(filename).read_text())
+            
         db_knowledge["faq"].extend(self.results)
         Path(filename).write_text(json.dumps(db_knowledge, indent=2, ensure_ascii=False))
 

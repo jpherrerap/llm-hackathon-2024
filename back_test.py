@@ -19,7 +19,7 @@ def create_test_databases():
     """
     # Create test knowledge database
     knowledge_db = {
-        "faqs": [
+        "faq": [
             {
                 "question": "¿Cuál es la política de devoluciones?",
                 "answer": "Los clientes tienen 30 días para devolver productos no utilizados."
@@ -83,7 +83,7 @@ def test_backend():
     with open("test_db_knowledge.json", "r", encoding="utf-8") as f:
         knowledge_db = json.load(f)
     
-    queries = [faq["question"] for faq in knowledge_db["faqs"]]
+    queries = [faq["question"] for faq in knowledge_db["faq"]]
     queries.append("¿Tienen alguna promoción actual?")  # Question not in database
     queries.append("¿Podrías explicarme más sobre los métodos de pago?")  # Ask for clarification
     queries.append("No entendí bien lo de la política de devoluciones, ¿puedes repetirlo?")  # Ask for re-explanation

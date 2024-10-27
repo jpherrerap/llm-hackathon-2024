@@ -200,7 +200,7 @@ class JSONAdapter:
         """
         with open(self.file_path, 'r') as f:
             database = json.load(f)
-        return database['faqs']
+        return database['faq']
 
     def save_faq(self, question: str, answer: str):
         """
@@ -212,7 +212,7 @@ class JSONAdapter:
         """
         with open(self.file_path, 'r+') as f:
             database = json.load(f)
-            database['faqs'].append({"question": question, "answer": answer})
+            database['faq'].append({"question": question, "answer": answer})
             f.seek(0)
             f.truncate()
             json.dump(database, f, indent=2)

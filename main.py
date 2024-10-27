@@ -1,8 +1,11 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
+from datetime import datetime
+import socket
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
@@ -10,42 +13,50 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 from back.client import BackClient
 import asyncio
-import socket
+from fastapi.responses import JSONResponse
+import argparse
+from bson import json_util
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='FastAPI Server Configuration')
+    parser.add_argument(
+        '--port', 
+        type=int, 
+        default=8000, 
+        help='Port to run the server on (default: 8000)'
+    )
+    parser.add_argument(
+        '--url', 
+        type=str, 
+        default=None, 
+        help='URL to scrape'
+    )
+    return parser.parse_args()
+
+
 
 # read local .env file
 _ = load_dotenv(find_dotenv())
-chat_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+# chat_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 
 # Connect to MongoDB
-def is_running_in_docker():
-    try:
-        with open('/proc/1/cgroup', 'rt') as ifh:
-            return 'docker' in ifh.read()
-    except FileNotFoundError:
-        return False
 
-if is_running_in_docker():
-    uri = os.environ.get("MONGO_URI", "mongodb://mongodb:27017")
-    PORT = 8001
-else:
-    uri = os.environ.get("EXTERNAL_MONGO_URI", "mongodb://localhost:27017")
-    PORT = 8000
+
+uri = os.environ.get("MONGO_URI", "mongodb://mongodb:27017")
+PORT = 8000
+
+
 client = MongoClient(uri)
 db = client['vue-chatbot']
 messages_collection = db['messages']
 messages_collection.delete_many({}) # Clear the messages collection
 messages_collection.insert_one({'role': 'system', 'content': 'You are a helpful assistant'}) # Add a system message
 
-# Get the API key from environment variables
+tickets_collection = db['tickets']
 
-# Create a OpenAI ChatGPT completion function
-def get_chat_response():
-    messages = get_messages()
-    response = chat_client.chat.completions.create(model="gpt-3.5-turbo",
-    messages=messages,
-    temperature=0.7)
-    messages_collection.insert_one({'role': 'assistant', 'content': response.choices[0].message.content})
+# Get the API key from environment variables
 
 def get_messages():
     messages = list(messages_collection.find({}))
@@ -54,6 +65,13 @@ def get_messages():
     return messages
 
 app = FastAPI(debug=True)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 # Set static file location
 # app.mount("/assets", StaticFiles(directory="dist/assets", ht), name="static")
@@ -70,59 +88,92 @@ async def root(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    client = await client_pool.get_client()
     try:
+        chat_client = BackClient("db_knowledge.json", "db_tickets.json")
+        chat_client.set_user_data(name="Sebastian", email="sebag@gmail.com", phone="1234567890")
+        message = chat_client.start_conversation().messages[-1]
+
+        ticket_id = f"TICKET-{len(list(tickets_collection.find())) + 1:04d}"
+        tickets_collection.insert_one({
+                "id": ticket_id,
+                "user_data": chat_client.user_data,
+                "createdAt": datetime.now().isoformat(),
+                "conversation": [],
+                "resolved": False
+            })
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            
-            if message_data['type'] == 'start_conversation':
-                user_data = message_data['content']
-                client.set_user_data(user_data['name'], user_data['email'], user_data['phone'])
-                response = client.start_conversation()
-                await websocket.send_text(json.dumps({
-                    'type': 'conversation_started',
-                    'content': response.messages[-1]["content"]
-                }))
-            
-            elif message_data['type'] == 'user_query':
-                response = client.process_user_query(message_data['content'])
-                await websocket.send_text(json.dumps({
-                    'type': 'assistant_response',
-                    'content': response.messages[-1]["content"]
-                }))
-            
-            elif message_data['type'] == 'get_conversation_history':
-                history = client.get_conversation_history()
-                await websocket.send_text(json.dumps({
-                    'type': 'conversation_history',
-                    'content': history
-                }))
-    
+            if message_data['type'] == 'get_messages':
+                messages = get_messages()
+                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
+
+            if message_data['type'] == 'new_message':
+                new_message = message_data['content']
+                user_message = {'role': 'user', 'content': new_message}
+                if new_message.lower() == 'cerrar':
+                    tickets_collection.update_one(
+                    {"id": ticket_id},
+                        {"$set": {"resolved": True}}
+                    )
+
+                messages_collection.insert_one(user_message)
+                messages = get_messages()
+                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
+
+                tickets_collection.update_one(
+                    {"id": ticket_id},
+                    {"$push": {"conversation": user_message}}
+                )
+                
+                response = chat_client.process_user_query(new_message)
+                message = response.messages[-1]
+                ai_message = {'role': 'assistant', 'content': message['content']}
+                messages_collection.insert_one(ai_message)
+                messages = get_messages()
+                
+                tickets_collection.update_one(
+                    {"id": ticket_id},
+                    {"$push": {"conversation": ai_message}}
+                )
+                
+                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
+
+            if message_data['type'] == 'clear_messages':
+                messages_collection.delete_many({})
+                messages_collection.insert_one({'role': 'system', 'content': 'You are a helpful assistant'})
+                messages = get_messages()
+                await websocket.send_text(json.dumps({'type': 'message_update', 'content': messages[1:]}))
+
+            if message_data['type'] == 'ping':
+                await websocket.send_text(json.dumps({'type': 'pong'}))
+
     except WebSocketDisconnect:
-        print("WebSocket disconnected")
-    finally:
-        await client_pool.release_client(client)
+        print("Client disconnected")
+        print(get_messages())
 
 @app.get("/api/tickets")
 async def get_tickets():
-    client = await client_pool.get_client()
+
     try:
-        tickets = client.get_all_tickets()
-        # Transformar los tickets al formato esperado por el frontend
+        tickets_bson = tickets_collection.find()
+        tickets = json.loads(json_util.dumps(tickets_bson))
         formatted_tickets = [
             {
-                "id": ticket["id"],
+                "id": str(ticket["id"]),  # Ensure id is a string
                 "title": f"Consulta de {ticket['user_data']['name']}",
                 "description": ticket['conversation'][0]['content'] if ticket['conversation'] else "Sin descripción",
-                "createdAt": ticket.get('createdAt', "Fecha no disponible"),
-                "resolved": ticket.get('resolved', False)
+                "createdAt": str(ticket.get('createdAt', "Fecha no disponible")),  # Ensure date is a string
+                "resolved": bool(ticket.get('resolved', False)),  # Ensure resolved is a boolean
+                # "user_data": ticket['user_data'],
+                "conversation": ticket['conversation']
             }
             for ticket in tickets
         ]
-        return formatted_tickets
-    finally:
-        await client_pool.release_client(client)
+        return JSONResponse(content=formatted_tickets)
+    except Exception as e:
+        print(f"Error in get_tickets: {str(e)}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 # Inicializar el BackClient
 back_client = BackClient("db_knowledge.json", "db_tickets.json")
@@ -194,6 +245,17 @@ class BackClientPool:
 
 client_pool = BackClientPool()
 
+# Modify your main block at the bottom:
 if __name__ == "__main__":
     import uvicorn
+    args = parse_arguments()
+    
+    # Update the PORT variable with the CLI argument
+    PORT = args.port
+    
+    # Store the URL if you need to use it later
+    SCRAPE_URL = args.url
+    if SCRAPE_URL:
+        print(f"URL to scrape: {SCRAPE_URL}")
+    
     uvicorn.run(app, host="0.0.0.0", port=PORT)

@@ -3,14 +3,18 @@
 Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza un backend en Python con FastAPI y un frontend en Vue.js para proporcionar una interfaz de chat interactiva que puede responder a las consultas de los clientes.
 
 ## Características
-
-- Chat en tiempo real con IA
+- Crea una knowledge base de preguntas frecuentes (FAQs) a partir de un URL
+- Chat en tiempo real con IA 
+- RAG con n-FAQs mejores coincidencias mediante OpenAIEmbeddings y ChromaDB
+- Dashboard de tickets de soporte
 - Interfaz de usuario intuitiva (Vue.js)
 - Con soporte de IAgents (Swarm) para db y redireccionamiento de customer service
 - Backend robusto con FastAPI y enfoque escalable/modular
 - Almacenamiento de mensajes en MongoDB
-- RAG con n-FAQs mejores coincidencias mediante OpenAIEmbeddings y ChromaDB
 - Creación de tickets de soporte automáticos y derivación a agentes humanos
+
+![Example 1](img/img1.png)
+![Example 2](img/img2.png)
 
 ## Requisitos
 

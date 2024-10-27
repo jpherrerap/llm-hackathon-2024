@@ -1,3 +1,172 @@
 {
-  "tickets": []
+  "tickets": [
+    {
+      "id": "TICKET-0001",
+      "user_data": {
+        "name": "juan",
+        "email": "juan@juan",
+        "phone": "123"
+      },
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Inicio de conversaci\u00f3n"
+        },
+        {
+          "role": "assistant",
+          "content": "Bienvenido al sistema de atenci\u00f3n al cliente."
+        },
+        {
+          "role": "Sistema",
+          "content": "\u00a1Hola! Soy tu asistente virtual. \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        },
+        {
+          "role": "Usuario",
+          "content": "hola"
+        },
+        {
+          "role": "Asistente",
+          "content": "\u00a1Hola! \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        }
+      ],
+      "createdAt": "2024-10-27T05:38:46.795279",
+      "resolved": false
+    },
+    {
+      "id": "TICKET-0002",
+      "user_data": {
+        "name": "Sebastian",
+        "email": "sebag@gmail.com",
+        "phone": "1234567890"
+      },
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Inicio de conversaci\u00f3n"
+        },
+        {
+          "role": "assistant",
+          "content": "Bienvenido al sistema de atenci\u00f3n al cliente."
+        },
+        {
+          "role": "Sistema",
+          "content": "\u00a1Hola! Soy tu asistente virtual. \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        },
+        {
+          "role": "Usuario",
+          "content": "plazos de devolucion?"
+        }
+      ],
+      "createdAt": "2024-10-27T06:29:23.447286",
+      "resolved": false
+    },
+    {
+      "id": "TICKET-0003",
+      "user_data": {
+        "name": "Sebastian",
+        "email": "sebag@gmail.com",
+        "phone": "1234567890"
+      },
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Inicio de conversaci\u00f3n"
+        },
+        {
+          "role": "assistant",
+          "content": "Bienvenido al sistema de atenci\u00f3n al cliente."
+        },
+        {
+          "role": "Sistema",
+          "content": "\u00a1Hola! Soy tu asistente virtual. \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        },
+        {
+          "role": "Usuario",
+          "content": "plazos de devoluciones?"
+        }
+      ],
+      "createdAt": "2024-10-27T06:30:16.285637",
+      "resolved": false
+    },
+    {
+      "id": "TICKET-0004",
+      "user_data": {
+        "name": "Sebastian",
+        "email": "sebag@gmail.com",
+        "phone": "1234567890"
+      },
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Inicio de conversaci\u00f3n"
+        },
+        {
+          "role": "assistant",
+          "content": "Bienvenido al sistema de atenci\u00f3n al cliente."
+        },
+        {
+          "role": "Sistema",
+          "content": "\u00a1Hola! Soy tu asistente virtual. \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        },
+        {
+          "role": "Usuario",
+          "content": "plazos de devolucion?"
+        },
+        {
+          "role": "Asistente",
+          "content": "Lamentablemente, la base de datos no proporciona una respuesta directa sobre los plazos de devoluci\u00f3n. Si necesitas detalles espec\u00edficos sobre las pol\u00edticas de devoluci\u00f3n, te recomendar\u00eda revisar en el sitio web oficial de la tienda o ponerte en contacto directamente con el servicio de atenci\u00f3n al cliente de tu tienda espec\u00edfica. \n\nSi tienes alguna otra pregunta o necesitas ayuda con algo m\u00e1s, \u00a1d\u00e9jame saber!"
+        },
+        {
+          "role": "Usuario",
+          "content": "devoluciones"
+        },
+        {
+          "role": "Asistente",
+          "content": "Parece que puedo ayudarte con informaci\u00f3n sobre devoluciones. Aqu\u00ed tienes algunos detalles relevantes:\n\n1. **Cambio o reemplazo de un producto**: Si necesitas devolver o cambiar un producto, puedes hacerlo dependiendo del tama\u00f1o del mismo. Revisa las instrucciones espec\u00edficas de la tienda donde realizaste la compra para conocer el procedimiento exacto.\n\n2. **Centro de ayuda**: Puedes gestionar tus pedidos, seguir tus compras, cancelar tus pedidos, hacer solicitudes de devoluci\u00f3n, revisar tus boletas y tickets de cambio, e ingresar tus casos desde el centro de ayuda.\n\n3. **Plazos de reembolso**: Generalmente es un proceso gratuito, y solo necesitas entregar el producto tal y como lo recibiste, con todas sus etiquetas.\n\nSi necesitas informaci\u00f3n m\u00e1s detallada o espec\u00edfica sobre tu situaci\u00f3n, no dudes en preguntarme."
+        },
+        {
+          "role": "Usuario",
+          "content": "gracias"
+        },
+        {
+          "role": "Asistente",
+          "content": "\u00a1De nada! Si tienes alguna otra pregunta o necesitas m\u00e1s ayuda, no dudes en dec\u00edrmelo. \u00a1Que tengas un excelente d\u00eda!"
+        }
+      ],
+      "createdAt": "2024-10-27T06:30:53.257733",
+      "resolved": false
+    },
+    {
+      "id": "TICKET-0005",
+      "user_data": {
+        "name": "Sebastian",
+        "email": "sebag@gmail.com",
+        "phone": "1234567890"
+      },
+      "conversation": [
+        {
+          "role": "system",
+          "content": "Inicio de conversaci\u00f3n"
+        },
+        {
+          "role": "assistant",
+          "content": "Bienvenido al sistema de atenci\u00f3n al cliente."
+        },
+        {
+          "role": "Sistema",
+          "content": "\u00a1Hola! Soy tu asistente virtual. \u00bfEn qu\u00e9 puedo ayudarte hoy?"
+        },
+        {
+          "role": "Usuario",
+          "content": "devoluciones"
+        },
+        {
+          "role": "Asistente",
+          "content": "Aqu\u00ed tienes informaci\u00f3n sobre devoluciones:\n\n1. **Cambio o reemplazo de productos**: Si necesitas cambiar o devolver un producto, tienes opciones dependiendo del tama\u00f1o del mismo. Es importante que entregues el producto tal y como lo recibiste, con todas sus etiquetas.\n\n2. **Centro de ayuda**: En el centro de ayuda, puedes gestionar tus pedidos, seguir tus compras, cancelar pedidos, hacer solicitudes de devoluci\u00f3n, revisar boletas y tickets de cambio, y m\u00e1s.\n\n3. **Plazos de reembolso**: El proceso es gratuito, y solo necesitas entregar el producto tal como lo recibiste.\n\nSi tienes m\u00e1s preguntas o necesitas asistencia adicional, por favor h\u00e1zmelo saber."
+        }
+      ],
+      "createdAt": "2024-10-27T06:42:43.340376",
+      "resolved": false
+    }
+  ]
 }
