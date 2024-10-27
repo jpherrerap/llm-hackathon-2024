@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Tuple
+from typing import Dict, List, Any
 from dotenv import load_dotenv
 from back.agents import AgentManager
 from back.database_manager import TicketDatabase
@@ -14,22 +14,31 @@ class BackClient:
 
     def set_user_data(self, name: str, email: str, phone: str) -> Dict[str, str]:
         user_data = {"name": name, "email": email, "phone": phone}
-        user_data["ticket_id"] = self.ticket_db.save_ticket(user_data, "Inicio de conversación")
+        user_data["ticket_id"] = self.ticket_db.save_ticket(user_data, "Inicio de conversación", "Bienvenido al sistema de atención al cliente.")
         self.user_data = user_data
         return user_data
 
     def start_conversation(self):
         content = "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?"
         self.agent_manager.messages.append({"role": "assistant", "content": content, "sender": "WelcomeAgent"})
+        self.ticket_db.update_ticket(self.user_data["ticket_id"], "Sistema", content)
         return self.agent_manager
 
     def process_user_query(self, user_query: str):
-        self.ticket_db.update_ticket(self.user_data["ticket_id"], user_query)
+        self.ticket_db.update_ticket(self.user_data["ticket_id"], "Usuario", user_query)
         response = self.agent_manager.run(user_query=user_query, context=self.user_data)
+        assistant_response = response.messages[-1]["content"]
+        self.ticket_db.update_ticket(self.user_data["ticket_id"], "Asistente", assistant_response)
         return response
 
     def get_conversation_history(self):
         return self.agent_manager.messages
+
+    def get_all_tickets(self) -> List[Dict[str, Any]]:
+        return self.ticket_db.get_all_tickets()
+
+    def get_ticket(self, ticket_id: str) -> Dict[str, Any]:
+        return self.ticket_db.get_ticket(ticket_id)
 
 # Ejemplo de uso
 if __name__ == "__main__":

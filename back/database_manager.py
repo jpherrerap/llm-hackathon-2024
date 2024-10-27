@@ -167,26 +167,29 @@ class TicketDatabase:
     def __init__(self, database_file: str):
         self.database_file = database_file
 
-    def save_ticket(self, user_data: Dict[str, str], query: str) -> str:
+    def save_ticket(self, user_data: Dict[str, str], query: str, response: str) -> str:
         with open(self.database_file, 'r+') as f:
             database = json.load(f)
             ticket_id = f"TICKET-{len(database['tickets']) + 1:04d}"
             database['tickets'].append({
                 "id": ticket_id,
                 "user_data": user_data,
-                "queries": [query]
+                "conversation": [
+                    {"role": "system", "content": query},
+                    {"role": "assistant", "content": response}
+                ]
             })
             f.seek(0)
             f.truncate()
             json.dump(database, f, indent=2)
         return ticket_id
 
-    def update_ticket(self, ticket_id: str, query: str):
+    def update_ticket(self, ticket_id: str, role: str, content: str):
         with open(self.database_file, 'r+') as f:
             database = json.load(f)
             for ticket in database['tickets']:
                 if ticket['id'] == ticket_id:
-                    ticket['queries'].append(query)
+                    ticket['conversation'].append({"role": role, "content": content})
                     break
             f.seek(0)
             f.truncate()

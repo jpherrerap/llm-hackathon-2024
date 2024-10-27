@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
@@ -6,6 +6,9 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
+from pydantic import BaseModel
+from typing import List, Dict, Any
+from back.client import BackClient
 
 # read local .env file
 _ = load_dotenv(find_dotenv())
@@ -92,6 +95,42 @@ async def get_tickets():
         {"id": 2, "title": "Payment failed", "description": "Customer's payment was declined", "createdAt": "2024-03-14T15:45:00Z", "resolved": True},
         {"id": 3, "title": "Product missing", "description": "Order arrived but one item is missing", "createdAt": "2024-03-13T09:00:00Z", "resolved": False},
     ]
+
+# Inicializar el BackClient
+back_client = BackClient("db_knowledge.json", "db_tickets.json")
+
+class UserData(BaseModel):
+    name: str
+    email: str
+    phone: str
+
+class UserQuery(BaseModel):
+    query: str
+
+@app.post("/start_conversation")
+async def start_conversation(user_data: UserData):
+    back_client.set_user_data(user_data.name, user_data.email, user_data.phone)
+    response = back_client.start_conversation()
+    return {"message": response.messages[-1]["content"]}
+
+@app.post("/process_query")
+async def process_query(user_query: UserQuery):
+    if not back_client.user_data:
+        raise HTTPException(status_code=400, detail="Conversation not started. Please start a conversation first.")
+    response = back_client.process_user_query(user_query.query)
+    return {"message": response.messages[-1]["content"]}
+
+@app.get("/tickets")
+async def get_tickets():
+    tickets = back_client.get_all_tickets()
+    return tickets
+
+@app.get("/tickets/{ticket_id}")
+async def get_ticket(ticket_id: str):
+    ticket = back_client.get_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return ticket
 
 if __name__ == "__main__":
     import uvicorn
