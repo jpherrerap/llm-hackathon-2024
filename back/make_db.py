@@ -25,8 +25,6 @@ docs = [
 
 embedding_model = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-
-
 # Split
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1800, chunk_overlap=100)
 all_splits = text_splitter.split_documents(docs)

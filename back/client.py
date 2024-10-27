@@ -7,6 +7,22 @@ from back.database_manager import TicketDatabase
 load_dotenv()
 
 class BackClient:
+    """
+    BackClient manages the interaction between the user, the agent system, and the ticket database.
+
+    This class handles user data, conversation flow, and ticket management. It provides methods
+    to start conversations, process user queries, and retrieve conversation history and tickets.
+
+    Attributes:
+        ticket_db (TicketDatabase): An instance of TicketDatabase for managing tickets.
+        agent_manager (AgentManager): An instance of AgentManager for handling agent interactions.
+        user_data (Dict[str, str]): Stores current user information.
+
+    Args:
+        knowledge_db_file (str): Path to the knowledge database file.
+        ticket_db_file (str): Path to the ticket database file.
+    """
+
     def __init__(self, knowledge_db_file: str, ticket_db_file: str):
         self.ticket_db = TicketDatabase(ticket_db_file)
         self.agent_manager = AgentManager(global_context={"knowledge_db_file": knowledge_db_file})
