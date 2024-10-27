@@ -6,7 +6,7 @@ from typing import Dict, List, Any
 from uuid import uuid4
 from langchain.schema import Document
 from langchain_openai import OpenAIEmbeddings
-from langchain_chroma import Chroma
+from langchain_community.vectorstores import Chroma
 from openai import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -17,8 +17,8 @@ class FAQManager:
             # base_url="https://api.groq.com/openai/v1",
         )
         self.embeddings = OpenAIEmbeddings(
+            # client=self.client,
             model="text-embedding-3-small",
-            client=self.client,
             embedding_ctx_length=8191,  # Longitud máxima del contexto
             chunk_size=1000,  # Tamaño del chunk para procesamiento por lotes
         )
@@ -72,8 +72,14 @@ class FAQManager:
                 split.metadata = original_doc.metadata
             split.id = str(uuid4())  # Asignar un nuevo ID único a cada split
 
+        vector_store = Chroma(
+            collection_name="faq-collection",
+            embedding_function=self.embeddings,
+            persist_directory=self.persist_directory,  # Where to save data locally, remove if not necessary
+        )
+
         # Crear y persistir la base de datos vectorial
-        self.knowledge_db = Chroma.from_documents(
+        self.knowledge_db = vector_store.from_documents(
             documents=all_splits,
             embedding=self.embeddings,
             collection_name="faq-collection",
