@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 from back.client import BackClient
 import asyncio
+import socket
 
 # read local .env file
 _ = load_dotenv(find_dotenv())
@@ -17,7 +18,19 @@ chat_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 
 # Connect to MongoDB
-uri = os.environ["MONGO_URI"]
+def is_running_in_docker():
+    try:
+        with open('/proc/1/cgroup', 'rt') as ifh:
+            return 'docker' in ifh.read()
+    except FileNotFoundError:
+        return False
+
+if is_running_in_docker():
+    uri = os.environ.get("MONGO_URI", "mongodb://mongodb:27017")
+    PORT = 8001
+else:
+    uri = os.environ.get("EXTERNAL_MONGO_URI", "mongodb://localhost:27017")
+    PORT = 8000
 client = MongoClient(uri)
 db = client['vue-chatbot']
 messages_collection = db['messages']
@@ -183,4 +196,4 @@ client_pool = BackClientPool()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
