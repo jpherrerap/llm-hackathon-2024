@@ -1,89 +1,53 @@
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 from dotenv import load_dotenv
-from openai import OpenAI
-from swarm import Swarm
-from back.agents import create_triage_agent
-from back.database_manager import FAQManager, TicketDatabase
-import json
+from back.agents import AgentManager
+from back.database_manager import TicketDatabase
 
 load_dotenv()
 
 class BackClient:
     def __init__(self, knowledge_db_file: str, ticket_db_file: str):
-        self.groq_api_key = os.getenv("GROQ_API_KEY")
-        if not self.groq_api_key:
-            raise ValueError("GROQ_API_KEY is not set in the environment variables.")
-        
-        self.client = OpenAI(
-            base_url="https://api.groq.com/openai/v1",
-            api_key=self.groq_api_key,
-        )
-        self.swarm = Swarm(client=self.client)
-        self.faq_manager = FAQManager(knowledge_db_file)
         self.ticket_db = TicketDatabase(ticket_db_file)
+        self.agent_manager = AgentManager(global_context={"knowledge_db_file": knowledge_db_file})
+        self.user_data = None
 
-        # Inicializar agente de triage
-        self.triage_agent = create_triage_agent(self.faq_manager)
+    def set_user_data(self, name: str, email: str, phone: str) -> Dict[str, str]:
+        user_data = {"name": name, "email": email, "phone": phone}
+        user_data["ticket_id"] = self.ticket_db.save_ticket(user_data, "Inicio de conversación")
+        self.user_data = user_data
+        return user_data
 
-    def start_conversation(self) -> str:
-        welcome_response = self.swarm.run(
-            agent=self.triage_agent,
-            messages=[{"role": "system", "content": "Inicia la conversación con un saludo de bienvenida."}]
-        )
-        try:
-            result = json.loads(welcome_response.messages[-1]["content"])
-            return result["response"]
-        except json.JSONDecodeError:
-            return welcome_response.messages[-1]["content"]
+    def start_conversation(self):
+        content = "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?"
+        self.agent_manager.messages.append({"role": "assistant", "content": content, "sender": "WelcomeAgent"})
+        return self.agent_manager
 
-    def process_user_query(self, user_query: str, user_data: Dict[str, str], conversation_history: List[Dict[str, str]], ticket_id: str = None) -> Tuple[str, str]:
-        if not ticket_id:
-            ticket_id = self.ticket_db.save_ticket(user_data, user_query)
-        else:
-            self.ticket_db.update_ticket(ticket_id, user_query)
+    def process_user_query(self, user_query: str):
+        self.ticket_db.update_ticket(self.user_data["ticket_id"], user_query)
+        response = self.agent_manager.run(user_query=user_query, context=self.user_data)
+        return response
 
-        conversation_history.append({"role": "user", "content": user_query})
-
-        triage_response = self.swarm.run(
-            agent=self.triage_agent,
-            messages=[
-                {"role": "system", "content": "Procesa la consulta del usuario y proporciona una respuesta adecuada."},
-                *conversation_history
-            ]
-        )
-
-        try:
-            result = json.loads(triage_response.messages[-1]["content"])
-            response = result["response"]
-        except json.JSONDecodeError:
-            response = triage_response.messages[-1]["content"]
-
-        conversation_history.append({"role": "assistant", "content": response})
-        return response, ticket_id
-
-    def get_user_data(self) -> Dict[str, str]:
-        print("Por favor, proporcione sus datos:")
-        name = input("Nombre: ")
-        email = input("Email: ")
-        phone = input("Teléfono: ")
-        return {"name": name, "email": email, "phone": phone}
+    def get_conversation_history(self):
+        return self.agent_manager.messages
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    back_client = BackClient("knowledge_db.json", "ticket_db.json")
+    back_client = BackClient("db_knowledge.json", "db_tickets.json")
     
-    conversation_history = []
-    user_data = back_client.get_user_data()
-    ticket_id = None
+    back_client.set_user_data(name="Sebastian", email="sebag@gmail.com", phone="1234567890")
 
     welcome_message = back_client.start_conversation()
-    print("Asistente:", welcome_message)
-    conversation_history.append({"role": "assistant", "content": welcome_message})
+    print("Asistente:", welcome_message.messages[-1]["content"])
 
     while True:
         user_input = input("Usuario: ")
         if user_input.lower() == 'salir':
             break
-        response, ticket_id = back_client.process_user_query(user_input, user_data, conversation_history, ticket_id)
-        print("Asistente:", response)
+        response = back_client.process_user_query(user_input)
+        message = response.messages[-1]
+        print(f"{message['role']}({response.agent.name}): {message['content']}")
+
+    print("\nHistorial de la conversación:")
+    for message in back_client.get_conversation_history():
+        print(f"{message['role'].capitalize()}: {message['content']}")

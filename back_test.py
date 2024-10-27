@@ -4,58 +4,11 @@ import json
 from dotenv import load_dotenv
 from back.client import BackClient
 import shutil
-from back.database_manager import FAQManager
-from langchain.schema import Document
-import tempfile
 
 # Añadir el directorio actual al sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 load_dotenv()
-
-
-# def test_chroma_db():
-#     # Crear un directorio temporal para la base de datos
-#     temp_dir = tempfile.mkdtemp()
-    
-#     # Crear una instancia temporal de FAQManager
-#     temp_json_file = os.path.join(temp_dir, "temp_test_db.json")
-#     with open(temp_json_file, "w") as f:
-#         json.dump({"faqs": []}, f)
-    
-#     faq_manager = FAQManager(temp_json_file)
-    
-#     # Crear dos documentos de ejemplo
-#     doc1 = Document(
-#         page_content="Los clientes tienen 30 días para devolver productos no utilizados.",
-#         metadata={
-#             "question": "¿Cuál es la política de devoluciones?",
-#             "answer": "Los clientes tienen 30 días para devolver productos no utilizados."
-#         }
-#     )
-#     doc2 = Document(
-#         page_content="Aceptamos tarjetas de cr��dito, débito, PayPal y transferencia bancaria.",
-#         metadata={
-#             "question": "¿Qué métodos de pago aceptan?",
-#             "answer": "Aceptamos tarjetas de crédito, débito, PayPal y transferencia bancaria."
-#         }
-#     )
-    
-#     # Añadir documentos a la base de datos vectorial
-#     faq_manager.knowledge_db.add_documents([doc1, doc2])
-    
-#     # Realizar una búsqueda de prueba
-#     query = "política de devoluciones"
-#     results = faq_manager.search_faq(query, k=1)
-    
-#     # Verificar los resultados
-#     assert len(results) == 1, "Se esperaba 1 resultado"
-#     assert "política de devoluciones" in results[0]["question"].lower(), "La pregunta no coincide con la consulta"
-    
-#     print("Test de Chroma DB completado con éxito.")
-    
-#     # Limpiar
-#     shutil.rmtree(temp_dir, ignore_errors=True)
 
 def create_test_databases():
     # Crear base de datos de conocimientos de prueba
@@ -99,14 +52,13 @@ def test_backend():
     # Inicializar el BackClient
     back_client = BackClient("test_db_knowledge.json", "test_db_tickets.json")
 
+    # Configurar datos del usuario
+    back_client.set_user_data(name="Juan Pérez", email="juan@example.com", phone="123456789")
+
     # Iniciar la conversación
     print("Iniciando conversación:")
     welcome_message = back_client.start_conversation()
-    print(f"Asistente: {welcome_message}")
-
-    # Simular una conversación
-    user_data = {"name": "Juan Pérez", "email": "juan@example.com", "phone": "123456789"}
-    conversation_history = [{"role": "assistant", "content": welcome_message}]
+    print(f"Asistente: {welcome_message.messages[-1]['content']}")
 
     # Usar las preguntas de la base de FAQs
     with open("test_db_knowledge.json", "r", encoding="utf-8") as f:
@@ -116,23 +68,24 @@ def test_backend():
     queries.append("¿Tienen alguna promoción actual?")  # Pregunta no en la base de datos
     queries.append("¿Podrías explicarme más sobre los métodos de pago?")  # Pide aclaración
     queries.append("No entendí bien lo de la política de devoluciones, ¿puedes repetirlo?")  # Pide reexplicación
+    queries.append("Tengo un problema con mi pedido, necesito hablar con un agente")  # Debería activar el servicio al cliente
     queries.append("Gracias por tu ayuda")
 
-    ticket_id = None
     for query in queries:
-        print(f"\nUsuario: {query}")
-        response, ticket_id = back_client.process_user_query(query, user_data, conversation_history, ticket_id)
-        print(f"Asistente: {response}")
-        conversation_history.append({"role": "user", "content": query})
-        conversation_history.append({"role": "assistant", "content": response})
+        print(f"\n\033[90mUsuario\033[0m: {query}")
+        response = back_client.process_user_query(query)
+        # Verificar si se ha transferido al agente de servicio al cliente
+        if response.agent.name == "CustomerServiceAgent":
+            print("La conversación ha sido transferida al agente de servicio al cliente.")
+            break
 
     # Verificar tickets guardados
     print("\nTickets guardados:")
     for ticket in back_client.ticket_db.get_all_tickets():
         print(f"ID: {ticket['id']}")
-        print(f"Queries: {ticket['queries']}")
         print(f"User Data: {ticket['user_data']}")
         print("---")
+
         
     # Eliminar bases de datos de prueba
     remove_test_databases() 
