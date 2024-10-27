@@ -8,18 +8,30 @@ import json
 def search_database(messages: List[Dict[str, str]], context_variables: Dict[str, Any]) -> str:
     faq_manager = FAQManager(context_variables["knowledge_db_file"])
     
-    if isinstance(messages, str):
+    if isinstance(messages, str): # 5 ultimas consultas
         enriched_query = [messages]
     else:
         enriched_query = messages[-5:]
 
     enriched_query = " ".join(enriched_query)
-    results = faq_manager.search_faq(enriched_query)
-    print(f"\033[92mBest database result:\033[0m {results}")
+    results = faq_manager.search_faq(enriched_query, k=3)
+    print(f"\033[92mDatabase top-3 results:\033[0m")
     if not results:
         return json.dumps({"answer": None, "confidence": 0})
+    
+    for result in results:
+        print(f"Question: {result['question']}")
+        print(f"Answer: {result['answer']}")
+        print(f"Confidence: {result['score']}")
+        print("---")
+    
     best_result = max(results, key=lambda x: x['score'])
-    db_response = f"Respuesta de la base de datos: {best_result['answer']}"
+    db_response = f"Respuestas de la base de datos:\n"
+    for result in results:
+        db_response += f"Pregunta: {result['question']}\n"
+        db_response += f"Respuesta: {result['answer']}\n"
+        db_response += f"Confianza: {result['score']}\n"
+        db_response += "---\n"
     return db_response
 
 def handle_customer_service(messages: List[Dict[str, str]], context_variables: Dict[str, Any]) -> str:
@@ -37,7 +49,8 @@ def transfer_back_to_triage_agent(messages: List[Dict[str, str]], context_variab
 
 triage_agent = Agent(
     name="TriageAgent",
-    instructions="Trasfiere al usuario a un agente de base de datos para responder la consulta. Solo si el usuario no esta conforme, transfiere a un agente de servicio al cliente.",
+    instructions="Trasfiere al usuario a un agente de base de datos para responder la consulta.\
+        Solo si el usuario no esta conforme, transfiere a un agente de servicio al cliente.",
     tool_choice="auto",
     parallel_tool_calls=False,
     functions=[search_database, transfer_to_customer_service_agent],
@@ -53,7 +66,8 @@ triage_agent = Agent(
 
 customer_service_agent = Agent(
     name="CustomerServiceAgent",
-    instructions="Maneja consultas de servicio al cliente que no se pueden responder con la información de la base de datos. En caso de terminar la solicitud, transfiere la consulta de nuevo al agente de triaje.",
+    instructions="Maneja consultas de servicio al cliente que no se pueden responder con la\
+        información de la base de datos. En caso de terminar la solicitud, transfiere la consulta de nuevo al agente de triaje.",
     tool_choice="auto",
     parallel_tool_calls=False,
     functions=[handle_customer_service, transfer_back_to_triage_agent],
@@ -80,6 +94,7 @@ def pretty_print_messages(messages) -> None:
             name, args = f["name"], f["arguments"]
             arg_str = json.dumps(json.loads(args)).replace(":", "=")
             print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
+
 class AgentManager:
     def __init__(self, global_context: Dict[str, Any] = {}):
         self.swarm = Swarm(
