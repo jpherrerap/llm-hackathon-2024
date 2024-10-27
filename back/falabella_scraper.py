@@ -8,6 +8,9 @@ import requests
 from bs4 import BeautifulSoup, NavigableString
 from langchain.agents import AgentType, initialize_agent, create_react_agent
 from langchain.chat_models import ChatOpenAI
+from langchain_mistralai import ChatMistralAI
+
+
 
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.tools import Tool
@@ -26,15 +29,14 @@ load_dotenv()
 # TODO: Arreglar warnings de LangChain en _s xd
 
 class FAQScraper:
-    def __init__(self, base_url: str, model: str, openai_api_key: str):
+    def __init__(self, base_url: str, model: str):
         self.base_url = base_url
         self.visited_urls = set()
         self.results = []
-        self.openai_api_key = openai_api_key
 
         # Initialize LangChain agent
         self.model = model
-        self.llm = ChatOpenAI(temperature=0, model=self.model, openai_api_key=openai_api_key)
+        self.llm = ChatMistralAI(temperature=0, model=self.model)
 
     def scrape(self, start_url: str, max_depth: int = 2) -> List[dict]:
         self._scrape_recursive(start_url, max_depth)
@@ -94,12 +96,12 @@ class FAQScraper:
         Path(filename).write_text(json.dumps(db_knowledge, indent=2, ensure_ascii=False))
 
 
-    @tool("Agrupar texto en formato pregunta-respuesta")
+    # @tool("Agrupar texto en formato pregunta-respuesta")
     def _group_text(self, text: str) -> List[dict]:
         """
         Agrupa texto en una lista de objetos JSON con formato question-answer
         """
-        llm = ChatOpenAI(temperature=0.1, model=self.model, openai_api_key=self.openai_api_key)
+        llm = ChatMistralAI(temperature=0.1, model=self.model)
         prompt = ChatPromptTemplate.from_messages([("system", "Del siguiente texto, para cada punto escribe una pregunta respondida por el texto. Luego entrega una lista de objetos JSON con atributos 'question' y 'answer'. Donde 'question' es la pregunta y 'answer' es la respuesta tomada tal como aparece en el texto. A continuación, el texto (recuerda responder con un fragmento de código markdown de un blob json con una única acción, y NADA más): \n\n {text}")])
         chain = prompt | llm
         grouped_text = chain.invoke({"text": text})
@@ -113,8 +115,7 @@ def main():
 
     scraper = FAQScraper(
         base_url="https://www.falabella.com/falabella-cl/page/",
-        model="gpt-4o-mini",
-        openai_api_key=os.environ["OPENAI_API_KEY"])
+        model="mistral-large-latest")
 
     scraper.scrape(start_url, max_depth=2)
     scraper.to_json("../db_knowledge.json")
