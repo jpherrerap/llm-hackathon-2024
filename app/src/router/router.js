@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../Home.vue'
 import Dashboard from '../Dashboard.vue'
+import MainChat from '../MainChat.vue'
 import App from '../App.vue'
-import ChatContent from '../components/ChatContent.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    name: 'App',
+    component: App
   },
   {
     path: '/dashboard',

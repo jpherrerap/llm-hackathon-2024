@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import App from './App.vue'
+import App from './MainChat.vue'
 import Dashboard from './Dashboard.vue'
 
 export default {
