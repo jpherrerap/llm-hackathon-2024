@@ -5,9 +5,12 @@ Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza u
 ## Características
 
 - Chat en tiempo real con IA
-- Interfaz de usuario intuitiva
-- Backend robusto con FastAPI
+- Interfaz de usuario intuitiva (Vue.js)
+- Con soporte de IAgents (Swarm) para db y redireccionamiento de customer service
+- Backend robusto con FastAPI y enfoque escalable/modular
 - Almacenamiento de mensajes en MongoDB
+- RAG con n-FAQs mejores coincidencias mediante OpenAIEmbeddings y ChromaDB
+- Creación de tickets de soporte automáticos y derivación a agentes humanos
 
 ## Requisitos
 
