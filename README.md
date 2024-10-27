@@ -1,3 +1,5 @@
+![Banner](banner.png)
+
 # Aplicación de Soporte al Cliente con IA
 
 Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza un backend en Python con FastAPI y un frontend en Vue.js para proporcionar una interfaz de chat interactiva que puede responder a las consultas de los clientes.
