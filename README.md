@@ -77,7 +77,7 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para má
 
 ## Diagrama de Flujo del Pipeline
 
-![Diagrama de Flujo](diagrama_flujo.png)
+![Diagrama de Flujo](flow_diagram.png)
 
 ## Componentes del Pipeline
 
