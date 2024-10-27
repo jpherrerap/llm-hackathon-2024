@@ -83,6 +83,16 @@ async def websocket_endpoint(websocket: WebSocket):
         print("Client disconnected")
         print(get_messages())
 
+@app.get("/api/tickets")
+async def get_tickets():
+    # This is where you'd fetch tickets from your database
+    # For now, we'll return some dummy data
+    return [
+        {"id": 1, "title": "Cannot login", "description": "User is unable to login to their account", "createdAt": "2024-03-15T10:30:00Z", "resolved": False},
+        {"id": 2, "title": "Payment failed", "description": "Customer's payment was declined", "createdAt": "2024-03-14T15:45:00Z", "resolved": True},
+        {"id": 3, "title": "Product missing", "description": "Order arrived but one item is missing", "createdAt": "2024-03-13T09:00:00Z", "resolved": False},
+    ]
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
