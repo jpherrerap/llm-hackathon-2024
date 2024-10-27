@@ -1,6 +1,12 @@
 from back.client import BackClient
 
 def main():
+    """
+    Main function to run the Swarm CLI demo.
+    
+    This function initializes a BackClient, sets user data, and runs an interactive
+    loop for processing user queries until the user decides to exit.
+    """
     client = BackClient("db_knowledge.json", "db_tickets.json")
     print("Starting Swarm CLI 🐝")
     client.set_user_data(name="Sebastian", email="sebag@gmail.com", phone="1234567890")

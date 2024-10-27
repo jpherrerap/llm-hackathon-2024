@@ -12,7 +12,17 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from datetime import datetime
 
 class FAQManager:
+    """
+    Manages FAQ data using vector embeddings for efficient searching.
+    """
+
     def __init__(self, json_file: str):
+        """
+        Initialize the FAQManager.
+
+        Args:
+            json_file (str): Path to the JSON file containing FAQ data.
+        """
         self.client = OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"), # TODO: Cambiar por GROQ_API_KEY
             # base_url="https://api.groq.com/openai/v1",
@@ -29,6 +39,9 @@ class FAQManager:
         self._initialize_knowledge_db()
 
     def _initialize_knowledge_db(self):
+        """
+        Initialize the vector database with FAQ data from the JSON file.
+        """
         faqs = self.json_adapter.load_faqs()
         
         if not faqs:
@@ -89,6 +102,19 @@ class FAQManager:
         )
 
     def search_faq(self, query: str, k: int = 3) -> List[Dict[str, Any]]:
+        """
+        Search for FAQs similar to the given query.
+
+        Args:
+            query (str): The search query.
+            k (int): Number of results to return. Defaults to 3.
+
+        Returns:
+            List[Dict[str, Any]]: List of similar FAQs with their scores.
+
+        Raises:
+            ValueError: If the vector store is not initialized.
+        """
         if not self.knowledge_db:
             raise ValueError("Vector store no inicializado.")
         
@@ -106,6 +132,13 @@ class FAQManager:
         return formatted_results
 
     def add_faq(self, question: str, answer: str):
+        """
+        Add a new FAQ to both the JSON file and the vector database.
+
+        Args:
+            question (str): The FAQ question.
+            answer (str): The FAQ answer.
+        """
         # Guardar en JSON
         self.json_adapter.save_faq(question, answer)
         
@@ -137,20 +170,46 @@ class FAQManager:
         self.knowledge_db.add_documents(documents=splits, ids=[doc.id for doc in splits])
 
     def __del__(self):
+        """
+        Clean up temporary directory on object deletion.
+        """
         # Check if persist_directory exists before trying to delete it
         if hasattr(self, 'persist_directory'):
             shutil.rmtree(self.persist_directory, ignore_errors=True)
 
 class JSONAdapter:
+    """
+    Adapter for reading and writing FAQ data to a JSON file.
+    """
+
     def __init__(self, file_path: str):
+        """
+        Initialize the JSONAdapter.
+
+        Args:
+            file_path (str): Path to the JSON file.
+        """
         self.file_path = file_path
 
     def load_faqs(self) -> List[Dict[str, str]]:
+        """
+        Load FAQs from the JSON file.
+
+        Returns:
+            List[Dict[str, str]]: List of FAQ dictionaries.
+        """
         with open(self.file_path, 'r') as f:
             database = json.load(f)
         return database['faqs']
 
     def save_faq(self, question: str, answer: str):
+        """
+        Save a new FAQ to the JSON file.
+
+        Args:
+            question (str): The FAQ question.
+            answer (str): The FAQ answer.
+        """
         with open(self.file_path, 'r+') as f:
             database = json.load(f)
             database['faqs'].append({"question": question, "answer": answer})
@@ -159,16 +218,40 @@ class JSONAdapter:
             json.dump(database, f, indent=2)
 
     def get_all_faqs(self) -> List[Dict[str, str]]:
+        """
+        Get all FAQs from the JSON file.
+
+        Returns:
+            List[Dict[str, str]]: List of all FAQ dictionaries.
+        """
         return self.load_faqs()
 
-    def get_all_faqs(self) -> List[Dict[str, str]]:
-        return self.json_adapter.get_all_faqs()
-
 class TicketDatabase:
+    """
+    Manages ticket data in a JSON file.
+    """
+
     def __init__(self, database_file: str):
+        """
+        Initialize the TicketDatabase.
+
+        Args:
+            database_file (str): Path to the JSON file containing ticket data.
+        """
         self.database_file = database_file
 
     def save_ticket(self, user_data: Dict[str, str], query: str, response: str) -> str:
+        """
+        Save a new ticket to the database.
+
+        Args:
+            user_data (Dict[str, str]): User information.
+            query (str): User's query.
+            response (str): Assistant's response.
+
+        Returns:
+            str: The generated ticket ID.
+        """
         with open(self.database_file, 'r+') as f:
             database = json.load(f)
             ticket_id = f"TICKET-{len(database['tickets']) + 1:04d}"
@@ -188,6 +271,14 @@ class TicketDatabase:
         return ticket_id
 
     def update_ticket(self, ticket_id: str, role: str, content: str):
+        """
+        Update an existing ticket with a new message.
+
+        Args:
+            ticket_id (str): The ID of the ticket to update.
+            role (str): The role of the message sender (e.g., 'user' or 'assistant').
+            content (str): The content of the message.
+        """
         with open(self.database_file, 'r+') as f:
             database = json.load(f)
             for ticket in database['tickets']:
@@ -199,6 +290,15 @@ class TicketDatabase:
             json.dump(database, f, indent=2)
 
     def get_ticket(self, ticket_id: str) -> Dict[str, Any]:
+        """
+        Retrieve a ticket by its ID.
+
+        Args:
+            ticket_id (str): The ID of the ticket to retrieve.
+
+        Returns:
+            Dict[str, Any]: The ticket data, or None if not found.
+        """
         with open(self.database_file, 'r') as f:
             database = json.load(f)
         for ticket in database['tickets']:
@@ -207,11 +307,23 @@ class TicketDatabase:
         return None
 
     def get_all_tickets(self) -> List[Dict[str, Any]]:
+        """
+        Retrieve all tickets from the database.
+
+        Returns:
+            List[Dict[str, Any]]: List of all ticket dictionaries.
+        """
         with open(self.database_file, 'r') as f:
             database = json.load(f)
         return database['tickets']
 
     def resolve_ticket(self, ticket_id: str):
+        """
+        Mark a ticket as resolved.
+
+        Args:
+            ticket_id (str): The ID of the ticket to resolve.
+        """
         with open(self.database_file, 'r+') as f:
             database = json.load(f)
             for ticket in database['tickets']:
