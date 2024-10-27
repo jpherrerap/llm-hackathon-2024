@@ -16,4 +16,4 @@ langchain-core
 langchain-openai
 langchain-groq
 langchain-chroma
-# git+https://github.com/openai/swarm.git
+git+https://github.com/openai/swarm.git
