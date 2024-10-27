@@ -1,40 +1,474 @@
 {
-  "faqs": [
+  "faq": [
     {
-      "question": "¿Hasta cuándo tienen plazo los productos comprados en Cyber Monday para cambios?",
-      "answer": "tienen hasta el 31 de enero del 2025."
+      "question": "¿Qué puedo hacer en el centro de ayuda?",
+      "answer": "Revisa y gestiona tus pedidos, Sigue tus compras, Cancela tus pedidos, Haz tus solicitudes de devolución, Revisa tus boletas y tickets de cambio, Ingresa tus casos.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Cuál es el plazo para cambios de productos comprados en el periodo navidad?",
-      "answer": "tienen hasta el 31 de enero del 2025."
+      "question": "¿Cómo puedo contactarlos si necesito ayuda?",
+      "answer": "Llámanos 600 329 2002. Hablemos de lunes a sábados de 09:00 a 19:00 h.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Cuántos días tienes para pedir un cambio o reemplazo de la mayoría de los productos?",
-      "answer": "30 días desde que los recibes."
+      "question": "¿Puedo hablar con ellos por WhatsApp?",
+      "answer": "Hablemos por WhatsApp. Escríbenos de lunes a sábados de 09:00 a 19:00 h.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Qué tipo de productos se consideran pequeños o medianos?",
-      "answer": "Por ejemplo: perfumes, zapatos, microondas, televisores de hasta 32"
+      "question": "¿Cómo puedo comprar por teléfono?",
+      "answer": "Compremos por teléfono 600 390 6500. Te ayudamos a comprar de lunes a sábados de 09:00 a 22:00 h. domingos y festivos de 09:00 a 21:00 h.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Qué debes hacer para cambiar un producto vendido por Sodimac o Falabella?",
-      "answer": "Dirígete a la tienda del vendedor correspondiente con el producto y su boleta."
+      "question": "¿A qué número debo llamar si tengo dudas sobre Club Novios, Club Bebé o Club Deco?",
+      "answer": "¿Dudas con Club Novios, Club Bebé o Club Deco? +562 2380 0256. Hablemos de lunes a sábados de 09:00 a 19:00 h.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Cómo puedes devolver un producto vendido por Tottus?",
-      "answer": "Crea una solicitud en Mis compras y entrega el producto en uno de nuestros Puntos de entrega o en una sucursal Chilexpress adherida."
+      "question": "¿Dónde puedo escribir si tengo dudas sobre Banco Falabella o Tarjeta CMR?",
+      "answer": "Escríbenos a nuestro WhatsApp, disponible las 24 horas.",
+      "category": "Centro de ayuda"
     },
     {
-      "question": "¿Qué tipo de productos se consideran grandes o muy grandes?",
-      "answer": "Por ejemplo: refrigeradores, cocinas, camas, televisores de más de 32"
+      "question": "¿Por qué vender en falabella.com?",
+      "answer": "+180 millones de visitas mensuales regionales",
+      "category": "Vende en falabella.com"
     },
     {
-      "question": "¿Qué debes hacer para solicitar un reemplazo de un producto grande?",
-      "answer": "Crea una solicitud de reemplazo en Mis compras."
+      "question": "¿Cuánto han crecido las ventas desde 2019?",
+      "answer": "Crecimiento de las ventas en x2,8 veces desde 2019",
+      "category": "Vende en falabella.com"
     },
     {
-      "question": "¿Qué debes hacer si tu producto fue vendido por otro vendedor?",
-      "answer": "Solo lo puedes devolver."
+      "question": "¿Cuántos clientes hay a nivel regional?",
+      "answer": "37 millones de clientes a nivel regional",
+      "category": "Vende en falabella.com"
+    },
+    {
+      "question": "¿Qué beneficios obtengo al vender en falabella.com?",
+      "answer": "Mayor visibilidad para tu marca",
+      "category": "Vende en falabella.com"
+    },
+    {
+      "question": "¿Qué herramientas ofrece Falabella Seller Center?",
+      "answer": "Autogestionable y llena de herramientas para tomar las mejores decisiones",
+      "category": "Vende en falabella.com"
+    },
+    {
+      "question": "¿Qué se recomienda leer antes de empezar a vender?",
+      "answer": "Publica tus productos",
+      "category": "Vende en falabella.com"
+    },
+    {
+      "question": "¿Qué plataforma acompaña a los sellers en sus ventas?",
+      "answer": "Fpay, la plataforma que te acompañará en tus ventas en el Marketplace falabella.com",
+      "category": "Vende en falabella.com"
+    },
+    {
+      "question": "¿Cómo devuelvo un producto?",
+      "answer": "Es gratuito, solo debes entregar el producto tal y como lo recibiste, con todas sus etiquetas.",
+      "category": "Devoluciones y cambios"
+    },
+    {
+      "question": "¿Cómo cambio o reemplazo un producto?",
+      "answer": "Cambiar de opinión está bien. Si necesitas devolver o cambiar un producto aquí te contamos lo que tienes que hacer, dependiendo de su tamaño.",
+      "category": "Devoluciones y cambios"
+    },
+    {
+      "question": "¿Cuáles son los plazos de reembolso de dinero?",
+      "answer": "Es gratuito, solo debes entregar el producto tal y como lo recibiste, con todas sus etiquetas.",
+      "category": "Devoluciones y cambios"
+    },
+    {
+      "question": "¿Qué productos tienen condiciones especiales?",
+      "answer": "Es gratuito, solo debes entregar el producto tal y como lo recibiste, con todas sus etiquetas.",
+      "category": "Devoluciones y cambios"
+    },
+    {
+      "question": "¿Dónde puedo encontrar mis boletas y facturas si compré con mi cuenta falabella.com?",
+      "answer": "si compras con tu cuenta falabella.com siempre podrás encontrar tus boletas y facturas a través de Mis compras.",
+      "category": "Boletas y facturas"
+    },
+    {
+      "question": "¿Qué debo hacer si compré como invitado y quiero recuperar mi boleta o factura?",
+      "answer": "elige el vendedor de tu compra e ingresa unos datos para descargar una copia de tu boleta o factura.",
+      "category": "Boletas y facturas"
+    },
+    {
+      "question": "¿Qué opciones tengo para recuperar boletas o facturas vendidas por Falabella?",
+      "answer": "Recuperar boleta o factura.",
+      "category": "Boletas y facturas"
+    },
+    {
+      "question": "¿Qué opciones tengo para recuperar boletas o facturas vendidas por Sodimac?",
+      "answer": "Recuperar boleta, Recuperar factura.",
+      "category": "Boletas y facturas"
+    },
+    {
+      "question": "¿Qué opciones tengo para recuperar boletas o facturas vendidas por Tottus?",
+      "answer": "Recuperar boleta.",
+      "category": "Boletas y facturas"
+    },
+    {
+      "question": "¿Qué se puede hacer en falabella.com?",
+      "answer": "Vende en falabella.com",
+      "category": "Legales de vendedores"
+    },
+    {
+      "question": "¿Dónde se pueden encontrar concursos y bases legales?",
+      "answer": "Concursos y bases legales",
+      "category": "Legales de vendedores"
+    },
+    {
+      "question": "¿Qué canal se menciona para la integridad?",
+      "answer": "Canal de integridad - Integrity Channel",
+      "category": "Legales de vendedores"
+    },
+    {
+      "question": "¿Cómo se protege la información de los usuarios?",
+      "answer": "Cómo cuidamos tus datos",
+      "category": "Legales de vendedores"
+    },
+    {
+      "question": "¿Qué se puede hacer para ser parte de la empresa?",
+      "answer": "Sé parte de falabella.com",
+      "category": "Legales de vendedores"
+    },
+    {
+      "question": "¿Dónde puedo revisar el Código de Integridad?",
+      "answer": "Para revisar nuestro Código de Integridad, por favor haz click aquí.",
+      "category": "Canal de integridad"
+    },
+    {
+      "question": "¿Qué debo hacer si quiero hacer una consulta sobre el Código de Integridad?",
+      "answer": "Accede a nuestro Canal de Integridad.",
+      "category": "Canal de integridad"
+    },
+    {
+      "question": "¿Puedo informar sobre situaciones contrarias al Código de Integridad?",
+      "answer": "¿Quieres hacer una consulta sobre nuestro Código de Integridad, informar posibles situaciones contrarias a este Código o a la normativa vigente?",
+      "category": "Canal de integridad"
+    },
+    {
+      "question": "¿Para qué usamos tus datos?",
+      "answer": "Tus datos nos ayudan a conocerte para mejorar tu experiencia.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Cómo mejoramos tu experiencia?",
+      "answer": "Brindándote beneficios y descuentos que se adapten a ti.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Qué beneficios obtienes al inscribirte en CMR Puntos?",
+      "answer": "¡Siempre acumulas puntos con tus compras con cualquier medio de pago!",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Cómo mejoramos la experiencia de postventa?",
+      "answer": "Si te conocemos mejor es más fácil resolver las consultas o inquietudes que tengas con tus compras y servicios.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Qué ofrecemos para adaptarnos a tus necesidades?",
+      "answer": "Ofreciéndote productos y servicios que se acomoden a tus necesidades y gustos.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Qué debes saber sobre la seguridad de tus datos?",
+      "answer": "Tus datos están seguros, implementamos las medidas para ello.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Qué puedes esperar de nuestra transparencia?",
+      "answer": "Puedes confiar en que sólo usaremos tus datos para aquello que nos has autorizado.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Quién es el dueño de tus datos?",
+      "answer": "Tú eres el dueño o dueña de tus datos.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Cómo puedes ejercer tus derechos sobre tus datos?",
+      "answer": "Tú controlas qué hacemos con tus datos ejerciendo cuando quieras los derechos que te otorga la ley.",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿A dónde puedes escribir si tienes dudas sobre tus datos?",
+      "answer": "Escríbenos a la casilla [email protected]",
+      "category": "protección de datos"
+    },
+    {
+      "question": "¿Qué se puede regalar a los trabajadores?",
+      "answer": "¿Quieres regalar Gift Cards a tus trabajadores?",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Cómo se puede pagar?",
+      "answer": "Puedes comprar con transferencia electrónica y orden de compra a 30 días (previa evaluación de apertura de línea de crédito).",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Qué tipo de despacho ofrecen?",
+      "answer": "Contamos con despachos gratis dentro de Santiago, sujetos a disponibilidad y ubicación.",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Se pueden obtener descuentos?",
+      "answer": "Tendrás la opción de cotizar con descuentos.",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Dónde se puede cotizar?",
+      "answer": "Puedes cotizar tu pedido usando Falabella.com como catálogo (solo Productos vendidos por Falabella Retail).",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Qué facilidades de pago ofrecen?",
+      "answer": "Consulta por tu Línea de Crédito para pagar con Órdenes de Compra y pago a 30 días (previa Evaluación).",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Qué pasa si soy un cliente frecuente?",
+      "answer": "Si eres un Cliente Frecuente o si tienes necesidades de volumen alto, un ejecutivo estará asignado a tu cuenta para atender y responder a tus requerimientos.",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Cómo puedo hacer consultas y cotizaciones?",
+      "answer": "Necesitas cotizar? Te invitamos a llenar este formulario y te contactará un ejecutivo a la brevedad.",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Cuál es el contacto para consultas?",
+      "answer": "Cualquier previa duda que tengas, puedes contactarnos a nuestro correo o revisar nuestras preguntas frecuentes.",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Cuál es el número de contacto por Whatsapp?",
+      "answer": "+56994891940",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Cuál es el número de venta telefónica?",
+      "answer": "Venta telefónica 600 390 6500",
+      "category": "Venta empresa"
+    },
+    {
+      "question": "¿Qué evento se espera para el 2024?",
+      "answer": "la nueva edición de Cyber Monday 2024",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué tipo de promociones se mencionan para Cyber Monday?",
+      "answer": "grandes sorpresas, promociones y descuentos preparados especialmente para ti",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Dónde se pueden encontrar ofertas durante todo el año?",
+      "answer": "en tus marcas favoritas",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué productos se mencionan en las mejores ofertas?",
+      "answer": "iPhones, moda mujer, aire acondicionado, secadoras, parrillas, abrigos mujer y mucho más",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué se puede hacer con la app de falabella.com?",
+      "answer": "encontrar ofertas increíbles",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué se recomienda activar en la app para recibir ofertas?",
+      "answer": "activar tus notificaciones",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué información se debe saber sobre Cyber Monday?",
+      "answer": "nuestras tiendas Cybermonday Chile",
+      "category": "Cyber Monday 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Cuándo es el próximo Black Friday?",
+      "answer": "Black Friday 2024",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué categorías de productos tienen ofertas?",
+      "answer": "Moda, Celulares, Tecnología, Electrodomésticos y mucho más.",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué consolas de videojuegos están en oferta?",
+      "answer": "Nintendo Switch, Xbox, PS5",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué marcas de electrodomésticos están disponibles en las ofertas?",
+      "answer": "Samsung, Black&Decker, Whirlpool y muchas más.",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué ventaja ofrece el Black Friday para las compras navideñas?",
+      "answer": "Te brinda la oportunidad de adelantar tus compras navideñas y evitar el estrés de las aglomeraciones de última hora.",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué tipo de productos se pueden encontrar en Black Friday Chile 2024?",
+      "answer": "Desde las últimas tendencias en tecnología hasta muebles para el hogar y prendas de moda para toda la familia.",
+      "category": "Black Friday 2024 ⚡ Ofertas Hoy"
+    },
+    {
+      "question": "¿Qué evento se menciona en el texto?",
+      "answer": "Cyber Day 2024",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué tipo de ofertas se mencionan que están disponibles todo el año?",
+      "answer": "ofertas que tenemos todo el año en tus marcas favoritas",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Dónde se pueden encontrar las mejores ofertas?",
+      "answer": "en falabella.com",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué productos se mencionan en las ofertas?",
+      "answer": "iPhones, moda mujer, aire acondicionado, secadoras, parrillas, abrigos mujer y mucho más",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué se debe hacer para recibir ofertas en la app?",
+      "answer": "Activa tus notificaciones y recibe ofertas, promociones y descuentos que tenemos para ti, en la app",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué se debe hacer para estar al tanto de todas las ofertas del Cyber Day?",
+      "answer": "regístrate y actualiza tus datos para estar al tanto de todas nuestras ofertas",
+      "category": "Cyber Day 2024 ⚡ Ofertas"
+    },
+    {
+      "question": "¿Qué es Falabella?",
+      "answer": "Falabella es parte del ecosistema del Grupo Falabella y constituye la red de comercialización omnicanal enfocada en moda, tecnología y hogar más importante de Sudamérica.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuál es el objetivo de Falabella en relación a sus clientes?",
+      "answer": "Buscamos conectar con nuestros clientes desde diferentes plataformas y canales, potenciando la complementariedad del mundo físico y digital.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cómo contribuye Falabella al crecimiento sostenible de su negocio?",
+      "answer": "Contribuimos al crecimiento sostenible de nuestro negocio mediante la promoción del cuidado ambiental y el desarrollo social y cultural.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuántas tiendas por departamento tiene Falabella en Sudamérica?",
+      "answer": "102 tiendas por departamento en Chile, Colombia y Perú.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuántos colaboradores tiene Falabella en Sudamérica?",
+      "answer": "+ 24 mil colaboradores en Chile, Colombia y Perú.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuántos clientes tiene Falabella en Sudamérica?",
+      "answer": "+16 millones de clientes en Chile, Colombia y Perú.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuántas tiendas de Falabella tienen Certificación Leed en Latinoamérica?",
+      "answer": "39 tiendas con Certificación Leed en Latinoamérica.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Cuántas marcas propias tiene Falabella?",
+      "answer": "45 marcas propias.",
+      "category": "Falabella retail"
+    },
+    {
+      "question": "¿Quiénes son falabella.com?",
+      "answer": "Somos falabella.com",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Cuáles son las condiciones de compra en falabella.com?",
+      "answer": "Condiciones de tu compra en falabella.com",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Qué se busca con las compras realizadas en falabella.com?",
+      "answer": "Nuestra prioridad es que te sientas contento y satisfecho con las compras que realizas.",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Qué garantías y beneficios ofrece falabella.com?",
+      "answer": "Además de las garantías legales y las ofrecidas por los fabricantes y por los Vendedores de los productos que se comercializan en falabella.com, tenemos beneficios adicionales para entregarte una experiencia realmente satisfactoria.",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Qué se explicará en el texto sobre falabella.com?",
+      "answer": "A continuación, te explicaremos en qué consisten los derechos, garantías y beneficios a los que te puedes acoger al comprar o contratar a través de falabella.com.",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Qué se menciona sobre la seguridad de las compras?",
+      "answer": "Seguridad de tu compra y propiedad intelectual",
+      "category": "Términos y condiciones"
+    },
+    {
+      "question": "¿Qué tipo de cookies se utilizan en los sitios web de Falabella?",
+      "answer": "utilizamos cookies propias o de terceros",
+      "category": "Políticas de cookies"
+    },
+    {
+      "question": "¿Cuál es uno de los propósitos de utilizar cookies en Falabella?",
+      "answer": "mejorar nuestros servicios y su funcionamiento, así como para optimizar la experiencia de nuestros usuarios",
+      "category": "Políticas de cookies"
+    },
+    {
+      "question": "¿Qué información se elabora a partir de las cookies?",
+      "answer": "información estadística",
+      "category": "Políticas de cookies"
+    },
+    {
+      "question": "¿Cómo se personaliza el contenido ofrecido a los usuarios?",
+      "answer": "en base a un análisis de sus hábitos de navegación",
+      "category": "Políticas de cookies"
+    },
+    {
+      "question": "¿Cuál es el objetivo de la Política de cookies de Falabella?",
+      "answer": "ayudarte a comprender cómo y para qué Falabella.com SpA y el resto de las empresas Falabella utilizan las cookies y las opciones que tienes para gestionarlas",
+      "category": "Políticas de cookies"
+    },
+    {
+      "question": "¿Qué considera la Compañía como parte de su propuesta de valor?",
+      "answer": "la protección de tus datos personales",
+      "category": "Políticas de privacidad"
+    },
+    {
+      "question": "¿Qué se explica en este documento?",
+      "answer": "quién es el responsable del tratamiento de tus datos personales, cuál es la finalidad y legitimación con la que los tratamos, a quién podemos comunicarlos, por cuánto tiempo almacenamos tus datos, cómo y por qué los recabamos, de qué manera los utilizamos, y también te explicamos los procesos que hemos dispuesto para proteger tu privacidad y los derechos que te asisten.",
+      "category": "Políticas de privacidad"
+    },
+    {
+      "question": "¿Qué comprende el término Empresas Falabella?",
+      "answer": "Falabella S.A., Servicios e Inversiones Falabella Limitada, Servicios Falabella SpA, Banco Falabella, Promotora CMR Falabella S.A., Banco Falabella Corredores de Seguro Ltda., CF Seguros de Vida S.A., Seguros Falabella Corredores Limitada, Digital Payments SpA, Digital Payments Prepago S.A., Falabella Retail S.A., Sodimac S.A., Hipermercados Tottus S.A, Falabella Inmobiliario S.A., Open Plaza Chile SpA, Plaza S.A., Ikso SpA (Ikea), Promotora Chilena de Café Colombia S.A. (Juan Valdez), Imperial S.A. y Fazil SpA.",
+      "category": "Políticas de privacidad"
+    },
+    {
+      "question": "¿Con qué se integra la Política de Privacidad?",
+      "answer": "los Términos y Condiciones de contratación con la Compañía y, en general, de cualquier tipo de relación con la misma.",
+      "category": "Políticas de privacidad"
+    },
+    {
+      "question": "¿Dónde se puede contactar a la Compañía si hay preguntas u observaciones?",
+      "answer": "al correo electrónico [email protected]",
+      "category": "Políticas de privacidad"
     }
   ]
 }
