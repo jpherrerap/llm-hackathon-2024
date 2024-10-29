@@ -25,21 +25,22 @@ Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza u
 
 ## Configuración y Ejecución
 
-### Backend usando Docker Compose (Recomendado)
-
-1. Clona este repositorio:
+Clona este repositorio:
    ```
    git clone <url-del-repositorio>
    cd <nombre-del-directorio>
    ```
 
-2. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de OpenAI:
+### Backend usando Docker Compose (Recomendado)
+
+
+1. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de OpenAI:
    ``` OPENAI_API_KEY=tu_clave_api_aqui ```
 
-3. Ejecuta el backend con Docker Compose:
+2. Ejecuta el backend con Docker Compose:
    ``` docker compose up --build ```
 
-4. Accede a la aplicación en `http://localhost:8000`
+3. Accede a la aplicación en `http://localhost:8000`
 
 ### Opción 2: Backend Manual
 
@@ -48,8 +49,12 @@ Esta es una aplicación de soporte al cliente con agentes de IA y RAG. Utiliza u
 
 2. Instala y ejecuta MongoDB
 
-3. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de OpenAI:
-   ``` OPENAI_API_KEY=tu_clave_api_aqui; MONGO_URI=mongodb://localhost:27017 ```
+3. Crea un archivo `.env` en la raíz del proyecto y añade tu clave API de Mistral y OpenAI:
+   ``` 
+   MISTRAL_API_KEY=tu_clave_api_aqui
+   OPENAI_API_KEY=tu_clave_api_aqui 
+   MONGO_URI=mongodb://localhost:27017
+   ```
 
 4. Ejecuta el servidor FastAPI:
    ```python main.py```
